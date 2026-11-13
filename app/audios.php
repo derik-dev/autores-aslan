@@ -11,7 +11,7 @@ function audio_pasta(int $id): string
 {
     $config = require __DIR__ . '/config.php';
     $base   = $config['storage_path'] ?? (__DIR__ . '/storage');
-    return rtrim($base, '/\') . '/audios/' . $id;
+    return rtrim($base, '/\\') . '/audios/' . $id;
 }
 
 function audio_arquivo(int $id, int $ordem): string
