@@ -1,5 +1,5 @@
 /* Tokens de design do sistema */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Playfair+Display:wght@600&display=swap');
 
 :root {
   --bg: #FFFFFF;
@@ -11,6 +11,8 @@
   --text: #2D2622;
   --text-2: #4A403A;
   --radius: 6px;
+  --success: #2F7D4F;  /* só para status de sucesso */
+  --error: #B3382C;    /* só para status de erro */
 
   --font-body: 'Inter', sans-serif;
   --font-title: 'Playfair Display', serif; /* só títulos de página */
@@ -31,7 +33,7 @@ a { color: var(--brand); }
 
 .page-title {
   font-family: var(--font-title);
-  font-weight: 700;
+  font-weight: 600;
   font-size: 26px;
   margin: 0 0 12px;
 }
@@ -57,7 +59,7 @@ a { color: var(--brand); }
   border-left: 3px solid transparent;
 }
 .sidebar-nav a:hover { background: rgba(255, 255, 255, 0.1); }
-.sidebar-nav a.ativo { border-left-color: var(--accent); background: rgba(255, 255, 255, 0.14); font-weight: 500; }
+.sidebar-nav a.ativo { background: rgba(255, 255, 255, 0.18); font-weight: 600; }
 
 .sidebar-user {
   padding: 16px 20px 0;
@@ -103,7 +105,7 @@ a { color: var(--brand); }
 
 /* ---------- Formulário e botões ---------- */
 .form { display: flex; flex-direction: column; gap: 6px; margin-top: 16px; }
-.form label { font-weight: 500; margin-top: 8px; }
+.form label { font-weight: 600; margin-top: 8px; }
 .form input {
   font: inherit;
   color: var(--text);
@@ -112,11 +114,11 @@ a { color: var(--brand); }
   border-radius: var(--radius);
   padding: 9px 10px;
 }
-.form input:focus { outline: 2px solid var(--accent); outline-offset: 0; }
+.form input:focus { outline: 2px solid var(--brand); outline-offset: 0; }
 
 .btn {
   font: inherit;
-  font-weight: 500;
+  font-weight: 600;
   border: 1px solid transparent;
   border-radius: var(--radius);
   padding: 10px 16px;
@@ -124,11 +126,12 @@ a { color: var(--brand); }
   margin-top: 14px;
 }
 .btn-primary { background: var(--accent); color: var(--text); }
-.btn-primary:hover { background: #BA8650; }
+.btn-primary:hover { filter: brightness(0.95); }
+.btn:disabled { opacity: 0.6; cursor: wait; }
 
 .alerta {
   border: 1px solid var(--border);
-  border-left: 3px solid #B3402A;
+  border-left: 3px solid var(--error);
   border-radius: var(--radius);
   background: var(--hover);
   padding: 10px 12px;
@@ -163,3 +166,30 @@ a { color: var(--brand); }
   .sidebar.aberto { display: flex; }
   .conteudo { padding: 20px 16px; }
 }
+
+/* ---------- Ícones (Lucide, linha fina) ---------- */
+.icone {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.sidebar-nav a { display: flex; align-items: center; gap: 10px; }
+.link-sair { display: inline-flex; align-items: center; gap: 6px; }
+
+/* ---------- Estado vazio e status ---------- */
+.vazio {
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 32px 20px;
+  margin-top: 20px;
+  text-align: center;
+  color: var(--text-2);
+}
+.vazio strong { display: block; color: var(--text); font-weight: 600; margin-bottom: 4px; }
+.status-sucesso { color: var(--success); font-weight: 600; }
+.status-erro { color: var(--error); font-weight: 600; }

@@ -53,8 +53,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <label for="senha">Senha</label>
             <input type="password" id="senha" name="senha" autocomplete="current-password" required>
 
-            <button type="submit" class="btn btn-primary">Entrar</button>
+            <button type="submit" class="btn btn-primary" data-carregando="Entrando…">Entrar</button>
         </form>
     </main>
+    <script src="assets/js/app.js"></script>
 </body>
 </html>
