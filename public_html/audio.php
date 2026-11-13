@@ -16,6 +16,28 @@ try {
     $tabelasOk = false;
 }
 
+// Vindo da tela de tradução: já preenche título e texto com a tradução do usuário.
+$prefTitulo = '';
+$prefTexto  = '';
+$prefAviso  = '';
+$deTraducao = (int) ($_GET['traducao'] ?? 0);
+if ($deTraducao > 0 && $tabelasOk) {
+    try {
+        require_once __DIR__ . '/../app/traducoes.php';
+        $q = db()->prepare('SELECT titulo, idioma FROM traducoes WHERE id = ? AND usuario_id = ?');
+        $q->execute([$deTraducao, $usuario['id']]);
+        $tr = $q->fetch();
+        if ($tr) {
+            $nomeIdioma = TRAD_IDIOMAS[$tr['idioma']] ?? $tr['idioma'];
+            $prefTexto  = trad_texto_final($deTraducao);
+            $prefTitulo = $tr['titulo'] . ' (' . $nomeIdioma . ')';
+            $prefAviso  = 'Texto da tradução "' . $tr['titulo'] . '" para ' . $nomeIdioma . '. Escolha uma voz e clique em Gerar áudio.';
+        }
+    } catch (Throwable $e) {
+        error_log('audio.php (traducao): ' . $e->getMessage());
+    }
+}
+
 $rotulosStatus = ['concluido' => 'Pronto', 'erro' => 'Erro', 'processando' => 'Gerando', 'pendente' => 'Incompleto'];
 $classesStatus = ['concluido' => 'chip-ok', 'erro' => 'chip-erro', 'processando' => 'chip-neutro', 'pendente' => 'chip-neutro'];
 
@@ -35,9 +57,12 @@ layout_inicio('Texto em áudio', 'audio', $usuario);
 
             <section class="bloco">
                 <h2 class="bloco-titulo">Novo áudio</h2>
+<?php if ($prefAviso !== ''): ?>
+                <p class="texto-2"><?= e($prefAviso) ?></p>
+<?php endif; ?>
                 <div class="form">
                     <label for="titulo">Título</label>
-                    <input type="text" id="titulo" maxlength="200" placeholder="Ex.: Capítulo 1 – A chegada" autocomplete="off">
+                    <input type="text" id="titulo" maxlength="200" placeholder="Ex.: Capítulo 1 – A chegada" autocomplete="off" value="<?= e($prefTitulo) ?>">
 
                     <div class="duas-colunas">
                         <div class="coluna">
@@ -64,7 +89,7 @@ layout_inicio('Texto em áudio', 'audio', $usuario);
                         <label for="arquivo" class="btn btn-sec btn-sm" id="rotulo-arquivo">Enviar arquivo (.txt ou .docx)</label>
                         <input type="file" id="arquivo" accept=".txt,.docx" hidden>
                     </div>
-                    <textarea id="texto" rows="12" placeholder="Cole aqui o texto do livro ou do capítulo…"></textarea>
+                    <textarea id="texto" rows="12" placeholder="Cole aqui o texto do livro ou do capítulo…"><?= e($prefTexto) ?></textarea>
                     <p id="resumo" class="texto-2">Nenhum texto ainda.</p>
 
                     <p id="erro-form" class="alerta" role="alert" hidden></p>

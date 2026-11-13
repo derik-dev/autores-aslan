@@ -98,6 +98,7 @@
   }
   texto.addEventListener('input', atualizarResumo);
   modelo.addEventListener('change', atualizarResumo);
+  atualizarResumo(); // caso o texto já venha preenchido (ex.: de uma tradução)
 
   // ---------- Enviar arquivo (.txt / .docx) ----------
   arquivo.addEventListener('change', function () {

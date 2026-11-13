@@ -13,6 +13,10 @@ layout_inicio('Início', 'index', $usuario);
                 <h2>Texto em áudio</h2>
                 <p>Converta seus textos em áudio.</p>
             </a>
+            <a class="card" href="traducao.php">
+                <h2>Tradução</h2>
+                <p>Traduza seu livro e revise lado a lado.</p>
+            </a>
             <a class="card" href="vendas.php">
                 <h2>Vendas</h2>
                 <p>Acompanhe as vendas dos seus livros.</p>
