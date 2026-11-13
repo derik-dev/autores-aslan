@@ -22,3 +22,144 @@ body {
   color: var(--text);
   background: var(--bg);
 }
+
+/* ---------- Base ---------- */
+* { box-sizing: border-box; }
+body { margin: 0; line-height: 1.5; }
+a { color: var(--brand); }
+.texto-2 { color: var(--text-2); }
+
+.page-title {
+  font-family: var(--font-title);
+  font-weight: 700;
+  font-size: 26px;
+  margin: 0 0 12px;
+}
+
+/* ---------- Layout com menu lateral ---------- */
+.app { display: flex; min-height: 100vh; }
+
+.sidebar {
+  width: 230px;
+  flex-shrink: 0;
+  background: var(--brand);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 0;
+}
+.sidebar-brand { font-weight: 600; font-size: 16px; padding: 0 20px 20px; }
+.sidebar-nav { display: flex; flex-direction: column; flex: 1; }
+.sidebar-nav a {
+  color: #fff;
+  text-decoration: none;
+  padding: 10px 20px;
+  border-left: 3px solid transparent;
+}
+.sidebar-nav a:hover { background: rgba(255, 255, 255, 0.1); }
+.sidebar-nav a.ativo { border-left-color: var(--accent); background: rgba(255, 255, 255, 0.14); font-weight: 500; }
+
+.sidebar-user {
+  padding: 16px 20px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.25);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.sidebar-user form { margin: 0; }
+.link-sair {
+  background: none;
+  border: 0;
+  color: #fff;
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+}
+
+.conteudo { flex: 1; min-width: 0; padding: 32px; }
+.menu-toggle { display: none; }
+
+/* ---------- Cards do dashboard ---------- */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+.card {
+  display: block;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  color: var(--text);
+  text-decoration: none;
+}
+.card:hover { background: var(--hover); }
+.card h2 { margin: 0 0 6px; font-size: 15px; font-weight: 600; color: var(--brand); }
+.card p { margin: 0; color: var(--text-2); }
+
+/* ---------- Formulário e botões ---------- */
+.form { display: flex; flex-direction: column; gap: 6px; margin-top: 16px; }
+.form label { font-weight: 500; margin-top: 8px; }
+.form input {
+  font: inherit;
+  color: var(--text);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 9px 10px;
+}
+.form input:focus { outline: 2px solid var(--accent); outline-offset: 0; }
+
+.btn {
+  font: inherit;
+  font-weight: 500;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  padding: 10px 16px;
+  cursor: pointer;
+  margin-top: 14px;
+}
+.btn-primary { background: var(--accent); color: var(--text); }
+.btn-primary:hover { background: #BA8650; }
+
+.alerta {
+  border: 1px solid var(--border);
+  border-left: 3px solid #B3402A;
+  border-radius: var(--radius);
+  background: var(--hover);
+  padding: 10px 12px;
+  margin: 14px 0 0;
+}
+
+/* ---------- Tela de login ---------- */
+.pagina-login { display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 16px; }
+.login-box {
+  width: 100%;
+  max-width: 380px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+}
+
+/* ---------- Celular ---------- */
+@media (max-width: 760px) {
+  .app { flex-direction: column; }
+  .menu-toggle {
+    display: block;
+    background: var(--brand);
+    color: #fff;
+    border: 0;
+    padding: 12px 16px;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+  .sidebar { display: none; width: 100%; }
+  .sidebar.aberto { display: flex; }
+  .conteudo { padding: 20px 16px; }
+}
