@@ -175,6 +175,45 @@ try {
         resp(['ok' => true, 'aprovados' => $aprovados, 'total' => $total]);
     }
 
+    // ---------- Revisão: salvar a edição do texto original de um trecho ----------
+    if ($acao === 'salvar_original') {
+        $id    = (int) ($_POST['id'] ?? 0);
+        $ordem = (int) ($_POST['ordem'] ?? 0);
+        $texto = trim((string) ($_POST['texto'] ?? ''));
+        traducao_do_usuario($id, $usuario['id']);
+        if ($texto === '') {
+            falha('O texto original do trecho não pode ficar vazio.');
+        }
+        if (mb_strlen($texto, 'UTF-8') > 30000) {
+            falha('O trecho ficou grande demais.');
+        }
+        // Mudou o original: a tradução deixa de estar aprovada até ser revista.
+        db()->prepare('UPDATE traducao_trechos SET original = ?, chars = ?, aprovado = 0 WHERE traducao_id = ? AND ordem = ?')
+            ->execute([$texto, mb_strlen($texto, 'UTF-8'), $id, $ordem]);
+        [, $aprovados, $total] = trad_contagem($id);
+        resp(['ok' => true, 'aprovados' => $aprovados, 'total' => $total]);
+    }
+
+    // ---------- Revisão: corrigir ortografia e gramática do original (não grava; o editor decide) ----------
+    if ($acao === 'corrigir') {
+        $id    = (int) ($_POST['id'] ?? 0);
+        $texto = trim((string) ($_POST['texto'] ?? ''));
+        traducao_do_usuario($id, $usuario['id']);
+        if ($texto === '') {
+            falha('Não há texto para corrigir.');
+        }
+        if (mb_strlen($texto, 'UTF-8') > 30000) {
+            falha('O trecho ficou grande demais.');
+        }
+        set_time_limit(175);
+        try {
+            $corrigido = trad_corrigir($texto);
+        } catch (Throwable $e) {
+            falha(mb_substr($e->getMessage(), 0, 480, 'UTF-8'), 502);
+        }
+        resp(['ok' => true, 'texto' => $corrigido]);
+    }
+
     // ---------- Revisão: aprovar ou desfazer a aprovação de um trecho ----------
     if ($acao === 'aprovar') {
         $id    = (int) ($_POST['id'] ?? 0);

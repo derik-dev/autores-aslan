@@ -52,7 +52,7 @@ function num(int $n): string
 
 layout_inicio('Revisão da tradução', 'traducao', $usuario);
 ?>
-        <p class="texto-2"><a href="traducao.php">Tradução</a> / <strong><?= e($trad['titulo']) ?></strong> para <?= e($idiomaNome) ?>. Leia o original à esquerda, ajuste a tradução à direita e aprove cada trecho.</p>
+        <p class="texto-2"><a href="traducao.php">Tradução</a> / <strong><?= e($trad['titulo']) ?></strong> para <?= e($idiomaNome) ?>. À esquerda fica o seu texto, que você pode corrigir. À direita fica a tradução, que você ajusta e aprova trecho a trecho.</p>
 
         <div id="revisao" data-csrf="<?= e(csrf_token()) ?>" data-id="<?= (int) $trad['id'] ?>">
 
@@ -92,13 +92,18 @@ layout_inicio('Revisão da tradução', 'traducao', $usuario);
                 </div>
                 <div class="trad-colunas">
                     <div class="trad-lado">
-                        <span class="trad-rotulo">Original</span>
-                        <div class="trad-original"><?= e($p['original']) ?></div>
+                        <label class="trad-rotulo" for="o<?= $ord ?>">Seu texto (editável)</label>
+                        <textarea id="o<?= $ord ?>" class="trad-area trad-orig" rows="6"><?= e($p['original']) ?></textarea>
+                        <div class="trad-ferr">
+                            <button type="button" class="btn btn-sec btn-sm" data-acao="corrigir">Corrigir ortografia e gramática</button>
+                            <button type="button" class="btn btn-sec btn-sm" data-acao="desfazer" hidden>Desfazer correção</button>
+                            <span class="texto-2 trad-estado-o" aria-live="polite"></span>
+                        </div>
                     </div>
                     <div class="trad-lado">
                         <label class="trad-rotulo" for="t<?= $ord ?>">Tradução em <?= e($idiomaNome) ?></label>
 <?php if ($feito): ?>
-                        <textarea id="t<?= $ord ?>" class="trad-texto" rows="6"><?= e($p['traduzido']) ?></textarea>
+                        <textarea id="t<?= $ord ?>" class="trad-area trad-texto" rows="6"><?= e($p['traduzido']) ?></textarea>
 <?php else: ?>
                         <div class="trad-original texto-2">Este trecho ainda não foi traduzido.</div>
 <?php endif; ?>

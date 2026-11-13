@@ -297,7 +297,9 @@ a { color: var(--brand); }
   padding: 10px 12px;
   line-height: 1.6;
 }
-.trad-texto { line-height: 1.6; resize: vertical; min-height: 120px; }
+.trad-area { line-height: 1.6; resize: vertical; min-height: 120px; }
+.trad-ferr { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.trad-ferr [hidden] { display: none; }
 .trad-rodape { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 12px; }
 .trad-novo { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
 
