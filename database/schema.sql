@@ -1,0 +1,1 @@
+-- Estrutura (tabelas) do banco de dados MySQL.

@@ -1,0 +1,24 @@
+/* Tokens de design do sistema */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@600;700&display=swap');
+
+:root {
+  --bg: #FFFFFF;
+  --panel: #FFFFFF;
+  --border: #E7E1DB;
+  --hover: #F8F6F4;
+  --brand: #7A5238;   /* menu lateral e links */
+  --accent: #C8935A;  /* botão principal, com texto escuro */
+  --text: #2D2622;
+  --text-2: #4A403A;
+  --radius: 6px;
+
+  --font-body: 'Inter', sans-serif;
+  --font-title: 'Playfair Display', serif; /* só títulos de página */
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  background: var(--bg);
+}
