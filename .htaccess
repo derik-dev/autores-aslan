@@ -1,0 +1,11 @@
+# Raiz do repositório (clonado em public_html/autores na Hostinger)
+Options -Indexes
+RewriteEngine On
+
+# Bloqueia pastas e arquivos internos
+RewriteRule ^(app|database|\.git)(/|$) - [F,L]
+RewriteRule ^(README\.md|\.gitignore)$ - [F,L]
+
+# Serve o site a partir de public_html/
+RewriteRule ^$ public_html/ [L]
+RewriteRule ^(?!public_html/)(.*)$ public_html/$1 [L]
