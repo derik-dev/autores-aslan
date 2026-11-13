@@ -45,8 +45,9 @@ layout_inicio('Tradução', 'traducao', $usuario);
                         <?php endforeach; ?>
                     </select>
 
-                    <label for="instrucoes">Instruções para o tradutor (opcional)</label>
-                    <textarea id="instrucoes" rows="3" maxlength="1000" placeholder="Ex.: Manter os nomes dos personagens. Tom poético e informal. Chamar a protagonista de &quot;Ana&quot; em todo o livro."></textarea>
+                    <label for="instrucoes">Ficha do livro, glossário e personagens (opcional)</label>
+                    <textarea id="instrucoes" rows="6" maxlength="6000" placeholder="Gênero: thriller sobrenatural. Tom: tenso e seco. Diálogos: coloquial brasileiro.&#10;Glossário: The Stranger = O Desconhecido (sempre com maiúscula); Gabriel = manter.&#10;Gabriel: direto, sarcástico quando assustado, frases curtas. Nunca formal."></textarea>
+                    <p class="texto-2">Quanto mais concreto, melhor. Os termos do glossário são obrigatórios em todo o livro.</p>
 
                     <div class="rotulo-linha">
                         <label for="texto">Texto do livro</label>

@@ -71,6 +71,7 @@ layout_inicio('Revisão da tradução', 'traducao', $usuario);
                     <button type="button" class="btn btn-sec btn-sm filtro" data-filtro="pendentes">Pendentes</button>
                     <button type="button" class="btn btn-sec btn-sm filtro" data-filtro="aprovados">Aprovados</button>
                     <span id="rev-aviso" class="texto-2" aria-live="polite"></span>
+                    <span id="rev-duvidas" class="texto-2"></span>
                 </div>
             </div>
 
@@ -110,10 +111,16 @@ layout_inicio('Revisão da tradução', 'traducao', $usuario);
                     </div>
                 </div>
 <?php if ($feito): ?>
+                <div class="trad-alertas texto-2" aria-live="polite"></div>
                 <div class="trad-rodape">
                     <button type="button" class="btn btn-sec btn-sm" data-acao="aprovar"><?= $apr ? 'Desfazer aprovação' : 'Aprovar trecho' ?></button>
+                    <button type="button" class="btn btn-sec btn-sm" data-acao="conferir">Conferir com IA</button>
                     <button type="button" class="btn btn-sec btn-sm" data-acao="pedir">Traduzir de novo…</button>
                     <span class="texto-2 trad-estado" aria-live="polite"></span>
+                </div>
+                <div class="trad-conferencia" hidden>
+                    <span class="trad-rotulo">Conferência da IA (é só uma sugestão: quem decide é você)</span>
+                    <div class="trad-original trad-conf-texto"></div>
                 </div>
                 <div class="trad-novo" hidden>
                     <label for="a<?= $ord ?>">O que você quer mudar neste trecho? (opcional)</label>

@@ -55,7 +55,7 @@ CREATE TABLE IF NOT EXISTS traducoes (
     usuario_id     INT UNSIGNED NOT NULL,
     titulo         VARCHAR(200) NOT NULL,
     idioma         VARCHAR(5) NOT NULL,
-    instrucoes     VARCHAR(1000) NULL,
+    instrucoes     TEXT NULL,
     total_chars    INT UNSIGNED NOT NULL,
     status         ENUM('pendente','processando','concluido','erro') NOT NULL DEFAULT 'pendente',
     erro           VARCHAR(500) NULL,
@@ -77,3 +77,6 @@ CREATE TABLE IF NOT EXISTS traducao_trechos (
     UNIQUE KEY uq_traducao_ordem (traducao_id, ordem),
     CONSTRAINT fk_trad_trechos FOREIGN KEY (traducao_id) REFERENCES traducoes(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Se a tabela traducoes já existia antes desta versão, rode também (campo de ficha/glossário maior):
+-- ALTER TABLE traducoes MODIFY instrucoes TEXT NULL;

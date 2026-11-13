@@ -68,7 +68,7 @@ try {
         if (!isset(TRAD_IDIOMAS[$idioma])) {
             falha('Escolha o idioma da tradução.');
         }
-        $instrucoes = mb_substr($instrucoes, 0, 1000, 'UTF-8');
+        $instrucoes = mb_substr($instrucoes, 0, 6000, 'UTF-8');
         if (mb_strlen($texto, 'UTF-8') > TRAD_MAX_CHARS * 1.3) {
             falha('O texto é grande demais. Divida em partes de até ' . number_format(TRAD_MAX_CHARS, 0, ',', '.') . ' caracteres.');
         }
@@ -212,6 +212,26 @@ try {
             falha(mb_substr($e->getMessage(), 0, 480, 'UTF-8'), 502);
         }
         resp(['ok' => true, 'texto' => $corrigido]);
+    }
+
+    // ---------- Revisão: conferência por IA (compara original e tradução, só lista problemas) ----------
+    if ($acao === 'conferir') {
+        $id    = (int) ($_POST['id'] ?? 0);
+        $ordem = (int) ($_POST['ordem'] ?? 0);
+        $t     = traducao_do_usuario($id, $usuario['id']);
+        $q = db()->prepare('SELECT original, traduzido, feito FROM traducao_trechos WHERE traducao_id = ? AND ordem = ?');
+        $q->execute([$id, $ordem]);
+        $p = $q->fetch();
+        if (!$p || (int) $p['feito'] !== 1) {
+            falha('Este trecho ainda não foi traduzido.');
+        }
+        set_time_limit(175);
+        try {
+            $parecer = trad_conferir($p['original'], (string) $p['traduzido'], $t['idioma']);
+        } catch (Throwable $e) {
+            falha(mb_substr($e->getMessage(), 0, 480, 'UTF-8'), 502);
+        }
+        resp(['ok' => true, 'texto' => $parecer]);
     }
 
     // ---------- Revisão: aprovar ou desfazer a aprovação de um trecho ----------

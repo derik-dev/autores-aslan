@@ -56,16 +56,21 @@ function oa_mensagem_erro(int $codigo, string $corpo): string
 }
 
 // Envia uma mensagem e devolve o texto da resposta.
-function oa_mensagem(string $sistema, string $usuario, int $maxTokens = 8000, int $timeout = 150): string
+function oa_mensagem(string $sistema, string $usuario, int $maxTokens = 8000, int $timeout = 150, ?float $temperatura = null): string
 {
-    $corpo = json_encode([
+    $dados = [
         'model'                 => oa_modelo(),
         'max_completion_tokens' => $maxTokens,
         'messages'              => [
             ['role' => 'system', 'content' => $sistema],
             ['role' => 'user', 'content' => $usuario],
         ],
-    ], JSON_UNESCAPED_UNICODE);
+    ];
+    // Temperatura baixa = tradução mais estável e fiel. Modelos de raciocínio (o1, o3, gpt-5…) não aceitam o ajuste.
+    if ($temperatura !== null && !preg_match('/^(o\d|gpt-5)/i', $dados['model'])) {
+        $dados['temperature'] = $temperatura;
+    }
+    $corpo = json_encode($dados, JSON_UNESCAPED_UNICODE);
 
     $ch = curl_init(OA_URL);
     curl_setopt_array($ch, [

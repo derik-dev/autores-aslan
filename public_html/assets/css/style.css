@@ -306,3 +306,9 @@ a { color: var(--brand); }
 @media (max-width: 800px) {
   .trad-colunas { grid-template-columns: 1fr; }
 }
+
+.trad-alertas { margin-top: 10px; display: flex; flex-direction: column; gap: 4px; }
+.trad-alertas p { margin: 0; }
+.trad-alertas .aviso-erro { color: var(--error); }
+.trad-conferencia { margin-top: 12px; display: flex; flex-direction: column; gap: 6px; }
+.trad-conferencia[hidden] { display: none; }

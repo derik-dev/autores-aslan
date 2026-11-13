@@ -45,6 +45,51 @@
     aplicarFiltro();
   }
 
+  // ---------- Alertas automáticos e dúvidas marcadas pela IA ----------
+  var MARCA = /\{\{\?:\s*([^}]*)\}\}/g;
+
+  function paragrafos(t) { return t.split(/\n+/).filter(function (l) { return l.trim() !== ''; }).length; }
+
+  function revisarBloco(bloco) {
+    var area = bloco.querySelector('.trad-texto');
+    var caixa = bloco.querySelector('.trad-alertas');
+    if (!area || !caixa) return;
+    var orig = bloco.querySelector('.trad-orig').value;
+    var trad = area.value;
+    var itens = [];
+
+    var duvidas = [];
+    trad.replace(MARCA, function (_, d) { duvidas.push(d.trim()); return _; });
+    bloco.setAttribute('data-duvidas', duvidas.length);
+    duvidas.forEach(function (d) { itens.push({ erro: false, txt: 'Dúvida da IA: ' + d + ' (resolva e apague a marca {{?: …}} do texto)' }); });
+
+    var po = paragrafos(orig), pt = paragrafos(trad);
+    if (po !== pt) itens.push({ erro: true, txt: 'O original tem ' + po + ' parágrafo(s) e a tradução tem ' + pt + '. Confira se algo foi omitido ou unido.' });
+    if (orig.trim().length > 200 && trad.trim().length < orig.trim().length * 0.7) {
+      itens.push({ erro: true, txt: 'A tradução está bem mais curta que o original. Pode ter havido omissão.' });
+    }
+
+    caixa.innerHTML = '';
+    itens.forEach(function (i) {
+      var p = document.createElement('p');
+      if (i.erro) p.className = 'aviso-erro';
+      p.textContent = i.txt;
+      caixa.appendChild(p);
+    });
+    atualizarDuvidas();
+  }
+
+  function atualizarDuvidas() {
+    var total = 0, blocos = 0;
+    raiz.querySelectorAll('.trad-bloco').forEach(function (b) {
+      var n = parseInt(b.getAttribute('data-duvidas') || '0', 10);
+      if (n > 0) { total += n; blocos++; }
+    });
+    document.getElementById('rev-duvidas').textContent = total
+      ? total + ' dúvida(s) da IA em ' + blocos + ' trecho(s) para resolver'
+      : '';
+  }
+
   function aplicarFiltro() {
     var visiveis = 0;
     raiz.querySelectorAll('.trad-bloco').forEach(function (b) {
@@ -100,6 +145,7 @@
     var bloco = t.closest('.trad-bloco');
     if (t.classList.contains('trad-orig')) estadoOrig(bloco, 'Edição ainda não salva');
     else estado(bloco, 'Edição ainda não salva');
+    revisarBloco(bloco);
   });
 
   raiz.addEventListener('focusout', function (ev) {
@@ -165,6 +211,21 @@
       autoajustar(orig);
       b.hidden = true;
       salvarOriginal(bloco);
+    } else if (acao === 'conferir') {
+      var caixaConf = bloco.querySelector('.trad-conferencia');
+      b.disabled = true;
+      b.textContent = 'Conferindo…';
+      estado(bloco, 'A IA está comparando os dois lados, pode levar alguns segundos…');
+      salvarTudo(bloco).then(function () {
+        return chamar('conferir', { ordem: ordem });
+      }).then(function (j) {
+        b.disabled = false;
+        b.textContent = 'Conferir com IA';
+        if (!j.ok) { estado(bloco, 'Não deu certo: ' + j.erro); return; }
+        caixaConf.querySelector('.trad-conf-texto').textContent = j.texto;
+        caixaConf.hidden = false;
+        estado(bloco, 'Conferência pronta, logo abaixo.');
+      });
     } else if (acao === 'pedir') {
       var painel = bloco.querySelector('.trad-novo');
       painel.hidden = !painel.hidden;
@@ -189,6 +250,7 @@
         bloco.querySelector('.trad-novo').hidden = true;
         estadoOrig(bloco, '');
         estado(bloco, 'Trecho traduzido de novo. Leia e aprove.');
+        revisarBloco(bloco);
         atualizarContagem(j.aprovados, j.total);
       });
     }
@@ -224,4 +286,5 @@
   });
 
   raiz.querySelectorAll('.trad-area').forEach(autoajustar);
+  raiz.querySelectorAll('.trad-bloco[data-feito="1"]').forEach(revisarBloco);
 })();
