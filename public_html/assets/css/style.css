@@ -1,5 +1,5 @@
 /* Tokens de design do sistema */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Playfair+Display:wght@600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
 
 :root {
   --bg: #FFFFFF;
@@ -15,7 +15,7 @@
   --error: #B3382C;    /* só para status de erro */
 
   --font-body: 'Inter', sans-serif;
-  --font-title: 'Playfair Display', serif; /* só títulos de página */
+  --font-title: 'Inter', sans-serif; /* títulos também em Inter */
 }
 
 body {
