@@ -21,7 +21,7 @@ const ICONES = [
 
 function icone(string $nome): string
 {
-    return '<svg class="icone" viewBox="0 0 24 24" aria-hidden="true">' . (ICONES[$nome] ?? '') . '</svg>';
+    return '<svg class="icone" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">' . (ICONES[$nome] ?? '') . '</svg>';
 }
 
 function layout_inicio(string $titulo, string $ativo, array $usuario): void
@@ -33,7 +33,7 @@ function layout_inicio(string $titulo, string $ativo, array $usuario): void
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?= e($titulo) ?> · Autores</title>
-    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="<?= asset_url('assets/css/style.css') ?>">
 </head>
 <body>
 <div class="app">
@@ -63,7 +63,7 @@ function layout_fim(): void
     ?>
     </main>
 </div>
-<script src="assets/js/app.js"></script>
+<script src="<?= asset_url('assets/js/app.js') ?>"></script>
 </body>
 </html>
 <?php

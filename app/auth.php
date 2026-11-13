@@ -91,3 +91,12 @@ function e(?string $texto): string
 {
     return htmlspecialchars((string) $texto, ENT_QUOTES, 'UTF-8');
 }
+
+// Endereço de um arquivo da pasta pública com ?v=<data de modificação>, para o navegador
+// baixar o CSS/JS novo sempre que ele mudar (evita ficar preso em cache antigo).
+function asset_url(string $relativo): string
+{
+    $arquivo = dirname($_SERVER['SCRIPT_FILENAME']) . '/' . $relativo;
+    $versao  = is_file($arquivo) ? filemtime($arquivo) : time();
+    return $relativo . '?v=' . $versao;
+}

@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Primeiro acesso · Autores</title>
-    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="<?= asset_url('assets/css/style.css') ?>">
 </head>
 <body class="pagina-login">
     <main class="login-box">
@@ -64,6 +64,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <button type="submit" class="btn btn-primary" data-carregando="Criando…">Criar usuário</button>
         </form>
     </main>
-    <script src="assets/js/app.js"></script>
+    <script src="<?= asset_url('assets/js/app.js') ?>"></script>
 </body>
 </html>
