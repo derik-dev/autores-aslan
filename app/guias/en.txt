@@ -18,3 +18,5 @@ Regras específicas para português de Portugal → inglês americano:
   reescreva mantendo o sentido ("Que ideia" → "Where'd you get that idea?").
 - Horas no formato americano (7:05 p.m.). Mantenha euros.
 - Não traduza palavras sem equivalente (saudade) sem marcar {{?: ...}} para o autor.
+
+Revisao final: antes de entregar cada trecho, confira se nenhuma frase foi omitida e se nenhuma marca de duvida ficou sem necessidade.
