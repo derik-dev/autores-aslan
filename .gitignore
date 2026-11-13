@@ -6,3 +6,6 @@ app/config.php
 Thumbs.db
 .vscode/
 .idea/
+
+# Áudios gerados (arquivos MP3 criados pelo sistema)
+app/storage/
