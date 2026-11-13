@@ -8,8 +8,8 @@ const TRAD_TRECHO    = 3500;    // caracteres por trecho (a tradução tem taman
 const TRAD_MAX_CHARS = 500000;  // limite por livro
 
 const TRAD_IDIOMAS = [
+    'en' => 'Inglês americano',
     'pt' => 'Português do Brasil',
-    'en' => 'Inglês',
     'es' => 'Espanhol',
     'fr' => 'Francês',
     'it' => 'Italiano',
