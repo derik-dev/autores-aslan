@@ -2,7 +2,7 @@
 // Lógica da função "Tradução": dividir o livro em trechos e traduzir cada um com contexto.
 
 require_once __DIR__ . '/audios.php';
-require_once __DIR__ . '/anthropic.php';
+require_once __DIR__ . '/openai.php';
 
 const TRAD_TRECHO    = 3500;    // caracteres por trecho (a tradução tem tamanho parecido)
 const TRAD_MAX_CHARS = 500000;  // limite por livro
@@ -41,7 +41,7 @@ function trad_traduzir(string $texto, string $idioma, string $instrucoes, string
     }
     $usuario .= "Traduza este trecho:\n<texto>\n" . $texto . "\n</texto>";
 
-    $saida = cl_mensagem($sistema, $usuario);
+    $saida = oa_mensagem($sistema, $usuario);
     $saida = preg_replace('/^\s*<texto>\s*|\s*<\/texto>\s*$/u', '', $saida);
     return trim((string) $saida);
 }

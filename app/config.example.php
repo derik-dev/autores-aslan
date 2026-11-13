@@ -9,6 +9,10 @@ return [
     // Chave da API do ElevenLabs (texto em áudio). Crie em elevenlabs.io > Developers > API Keys.
     'elevenlabs_key' => 'SUA_CHAVE_ELEVENLABS',
 
-    // Chave da API da Anthropic (tradução de livros). Crie em console.anthropic.com > API Keys.
-    'anthropic_key' => 'SUA_CHAVE_ANTHROPIC',
+
+    // Chave da API da OpenAI (tradução de livros). Crie em platform.openai.com > API keys.
+    'openai_key' => 'SUA_CHAVE_OPENAI',
+
+    // Opcional: modelo da OpenAI usado na tradução (padrão: gpt-4.1).
+    // 'openai_model' => 'gpt-4.1',
 ];
