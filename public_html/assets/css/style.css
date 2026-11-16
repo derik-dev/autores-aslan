@@ -122,7 +122,7 @@ p { margin: 0 0 8px; }
 .menu-toggle { display: none; }
 
 /* ---------- Início: índice de funções ---------- */
-.indice-grupo { margin-top: 32px; max-width: 1000px; }
+.indice-grupo { margin-top: 32px; }
 .indice-titulo { font-size: 13px; font-weight: 600; color: var(--text-2); margin: 0 0 6px; }
 .indice { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--border); }
 .indice li { border-bottom: 1px solid var(--border); }
@@ -143,7 +143,7 @@ p { margin: 0 0 8px; }
 .indice-desc { color: var(--text-2); }
 
 /* ---------- Números de destaque (vendas) ---------- */
-.numeros { display: flex; flex-wrap: wrap; gap: 0; margin-top: 28px; max-width: 1000px; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.numeros { display: flex; flex-wrap: wrap; gap: 0; margin-top: 28px; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
 .numeros > div { flex: 1 1 200px; padding: 18px 20px 18px 0; display: flex; flex-direction: column; gap: 2px; }
 .numeros > div + div { padding-left: 20px; border-left: 1px solid var(--border); }
 .numeros strong { font-size: 24px; font-weight: 600; letter-spacing: -0.01em; line-height: 1.2; }
@@ -212,7 +212,7 @@ a.btn { text-decoration: none; }
   color: var(--text);
   padding: 10px 12px;
   margin: 14px 0 0;
-  max-width: 1000px;
+ 
 }
 .alerta[role="alert"] { background: #FBF1EF; border-color: #EBCBC5; color: #7A2219; }
 .alerta[role="status"] { background: #F0F6F2; border-color: #CBE0D2; color: #1F5236; }
@@ -236,7 +236,7 @@ a.btn { text-decoration: none; }
 .icone { width: 16px; height: 16px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
 
 /* ---------- Estados vazios e status ---------- */
-.vazio { padding: 18px 0; color: var(--text-2); border-top: 1px solid var(--border); max-width: 1000px; }
+.vazio { padding: 18px 0; color: var(--text-2); border-top: 1px solid var(--border); }
 .vazio strong { display: block; color: var(--text); font-weight: 600; margin-bottom: 2px; }
 .status-sucesso { color: var(--success); font-weight: 600; }
 .status-erro { color: var(--error); font-weight: 600; }
@@ -250,7 +250,7 @@ a.btn { text-decoration: none; }
 .chip-neutro::before { background: transparent; box-shadow: none; border: 1.5px solid currentColor; width: 7px; height: 7px; }
 
 /* ---------- Seções ---------- */
-.bloco { margin-top: 36px; padding-top: 22px; border-top: 1px solid var(--border); max-width: 1000px; }
+.bloco { margin-top: 36px; padding-top: 22px; border-top: 1px solid var(--border); }
 .page-title + .texto-2 + .bloco,
 .page-title + .bloco { margin-top: 24px; }
 .bloco-titulo { font-size: 15px; font-weight: 600; margin: 0 0 12px; }
@@ -409,3 +409,29 @@ a.btn { text-decoration: none; }
 /* Números alinhados à direita nas tabelas de valores */
 .tabela-num th:not(:first-child), .tabela-num td:not(:first-child) { text-align: right; }
 .tabela-num th:last-child, .tabela-num td:last-child { padding-right: 0; }
+
+/* ---------- Composição em duas áreas: formulário à esquerda, resultado à direita ---------- */
+#audio-app, #trad-app, #ent-app, #arc-app, #rel-app, #aut-app, #insp-app {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  grid-template-areas: "form lista" "prog lista";
+  grid-template-rows: auto 1fr;
+  column-gap: 56px;
+  align-items: start;
+}
+:is(#audio-app, #trad-app, #ent-app, #arc-app, #rel-app, #aut-app, #insp-app) > .bloco:first-child { grid-area: form; }
+:is(#audio-app, #trad-app, #ent-app, #arc-app, #rel-app, #aut-app, #insp-app) > #andamento { grid-area: prog; }
+:is(#audio-app, #trad-app, #ent-app, #arc-app, #rel-app, #aut-app, #insp-app) > .bloco:last-child { grid-area: lista; }
+
+/* Vendas: números e tabelas largas ocupam a linha toda; mês e canal ficam lado a lado */
+#vendas-app { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 56px; align-items: start; }
+#vendas-app > .todas, #vendas-app > .numeros, #vendas-app > .filtro-autor, #vendas-app > .vazio { grid-column: 1 / -1; }
+
+/* Início: grupos de funções em colunas */
+.indice-grade { display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); column-gap: 56px; align-items: start; }
+.indice-grade .indice-grupo { margin-top: 32px; }
+.indice-item { grid-template-columns: 18px minmax(110px, 160px) 1fr; }
+
+@media (max-width: 1100px) {
+  #audio-app, #trad-app, #ent-app, #arc-app, #rel-app, #aut-app, #insp-app, #vendas-app { display: block; }
+}

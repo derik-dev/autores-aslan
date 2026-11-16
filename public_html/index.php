@@ -71,6 +71,7 @@ layout_inicio('Início', 'index', $usuario);
         </section>
 <?php endif; ?>
 
+        <div class="indice-grade">
 <?php foreach (MENU_GRUPOS as $grupo => $chaves): ?>
 <?php if (in_array('autores', $chaves, true) && !eh_editora($usuario)) { continue; } ?>
         <section class="indice-grupo">
@@ -88,4 +89,5 @@ layout_inicio('Início', 'index', $usuario);
             </ul>
         </section>
 <?php endforeach; ?>
+        </div>
 <?php layout_fim(); ?>

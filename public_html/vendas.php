@@ -57,7 +57,7 @@ layout_inicio('Vendas', 'vendas', $usuario);
         <div id="vendas-app" data-csrf="<?= e(csrf_token()) ?>">
 
 <?php if ($editora): ?>
-            <section class="bloco">
+            <section class="bloco todas">
                 <h2 class="bloco-titulo">Importar relatório de vendas</h2>
                 <p class="texto-2">Envie um arquivo CSV com as colunas <strong>autor_email, livro, canal, data, quantidade, valor_bruto, receita_autor</strong>. O e-mail precisa ser o mesmo do cadastro do autor.</p>
                 <div class="linha-acoes">
@@ -124,20 +124,6 @@ layout_inicio('Vendas', 'vendas', $usuario);
             </section>
 
             <section class="bloco">
-                <h2 class="bloco-titulo">Por livro</h2>
-                <div class="tabela-rolagem">
-                    <table class="tabela tabela-num">
-                        <thead><tr><th>Livro</th><th>Exemplares</th><th>Vendas brutas</th><th>Receita do autor</th></tr></thead>
-                        <tbody>
-<?php foreach ($porLivro as $l): ?>
-                            <tr><td><?= e($l['livro']) ?></td><td><?= num_br($l['q']) ?></td><td><?= e(brl($l['b'])) ?></td><td><?= e(brl($l['r'])) ?></td></tr>
-<?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
-            <section class="bloco">
                 <h2 class="bloco-titulo">Por canal de venda</h2>
                 <div class="tabela-rolagem">
                     <table class="tabela tabela-num">
@@ -145,6 +131,20 @@ layout_inicio('Vendas', 'vendas', $usuario);
                         <tbody>
 <?php foreach ($porCanal as $c): ?>
                             <tr><td><?= e($c['canal']) ?></td><td><?= num_br($c['q']) ?></td><td><?= e(brl($c['r'])) ?></td></tr>
+<?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="bloco todas">
+                <h2 class="bloco-titulo">Por livro</h2>
+                <div class="tabela-rolagem">
+                    <table class="tabela tabela-num">
+                        <thead><tr><th>Livro</th><th>Exemplares</th><th>Vendas brutas</th><th>Receita do autor</th></tr></thead>
+                        <tbody>
+<?php foreach ($porLivro as $l): ?>
+                            <tr><td><?= e($l['livro']) ?></td><td><?= num_br($l['q']) ?></td><td><?= e(brl($l['b'])) ?></td><td><?= e(brl($l['r'])) ?></td></tr>
 <?php endforeach; ?>
                         </tbody>
                     </table>
