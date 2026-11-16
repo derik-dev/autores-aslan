@@ -35,7 +35,8 @@ function ebook_eh_titulo_de_capitulo(string $linha): bool
     if ($l === '' || mb_strlen($l, 'UTF-8') > 90) {
         return false;
     }
-    return (bool) preg_match('/^(#{1,2}\s+\S.*|(cap[ií]tulo|chapter|parte|part|pr[óo]logo|ep[íi]logo|prologue|epilogue)\b.*)$/iu', $l);
+    // "# Título", "Capítulo 3", "Parte II", "Chapter 5" ou "Prólogo"/"Epílogo" sozinhos na linha.
+    return (bool) preg_match('/^(#{1,2}\s+\S.*|(cap[ií]tulo|chapter|parte|part)\s+(\d+|[ivxlcdm]+)\b.*|(pr[óo]logo|ep[íi]logo|prologue|epilogue)\s*[:.-]?\s*\S{0,60})$/iu', $l);
 }
 
 // Divide o texto em capítulos: [['titulo' => ..., 'linhas' => [...]], ...]

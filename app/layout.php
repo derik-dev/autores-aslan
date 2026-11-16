@@ -2,6 +2,7 @@
 // Layout compartilhado das páginas internas (menu lateral + área de conteúdo).
 
 require_once __DIR__ . '/auth.php';
+require_once __DIR__ . '/http.php';
 
 const MENU = [
     'index'     => ['Início',            'index.php',      'casa'],
@@ -15,6 +16,7 @@ const MENU = [
     'vendas'    => ['Vendas',            'vendas.php',     'grafico'],
     'analises'  => ['Análises',          'analises.php',   'pulso'],
     'mercado'   => ['Mercado',           'mercado.php',    'busca'],
+    'autores'   => ['Autores',           'autores.php',    'pessoas'],
 ];
 
 // Ícones Lucide (linha fina), inline para não depender de serviço externo.
@@ -56,6 +58,7 @@ function layout_inicio(string $titulo, string $ativo, array $usuario): void
         <div class="sidebar-brand">Autores</div>
         <nav class="sidebar-nav">
             <?php foreach (MENU as $chave => [$rotulo, $link, $ico]): ?>
+                <?php if ($chave === 'autores' && !eh_editora($usuario)) { continue; } ?>
                 <a href="<?= e($link) ?>" class="<?= $chave === $ativo ? 'ativo' : '' ?>"><?= icone($ico) ?><span><?= e($rotulo) ?></span></a>
             <?php endforeach; ?>
         </nav>
