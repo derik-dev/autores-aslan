@@ -55,7 +55,7 @@ layout_inicio('Início', 'index', $usuario);
         <p class="texto-2">Olá, <?= e($usuario['nome']) ?>. Escolha uma função para começar.</p>
 
 <?php if ($andamento): ?>
-        <section class="indice-grupo">
+        <section class="indice-grupo indice-destaque">
             <h2 class="indice-titulo">Continue de onde parou</h2>
             <ul class="indice">
 <?php foreach ($andamento as [$chave, $link, $nome, $situacao]): [, , $ico] = MENU[$chave]; ?>

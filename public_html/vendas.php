@@ -56,34 +56,8 @@ layout_inicio('Vendas', 'vendas', $usuario);
 <?php else: ?>
         <div id="vendas-app" data-csrf="<?= e(csrf_token()) ?>">
 
+<?php $semVendas = ((int) $tot['q'] === 0 && (float) $tot['r'] === 0.0); ?>
 <?php if ($editora): ?>
-            <section class="bloco todas">
-                <h2 class="bloco-titulo">Importar relatório de vendas</h2>
-                <p class="texto-2">Envie um arquivo CSV com as colunas <strong>autor_email, livro, canal, data, quantidade, valor_bruto, receita_autor</strong>. O e-mail precisa ser o mesmo do cadastro do autor.</p>
-                <div class="linha-acoes">
-                    <label for="csv" class="btn btn-sec btn-sm" id="rotulo-csv">Enviar arquivo CSV</label>
-                    <input type="file" id="csv" accept=".csv,text/csv" hidden>
-                    <a class="btn btn-sec btn-sm" href="vendas_modelo.php">Baixar modelo de CSV</a>
-                </div>
-                <p id="imp-resultado" class="texto-2" aria-live="polite"></p>
-                <p id="imp-erro" class="alerta" role="alert" hidden></p>
-<?php if ($importacoes): ?>
-                <ul class="lista-audios">
-<?php foreach ($importacoes as $i): ?>
-                    <li class="linha-audio" data-id="<?= (int) $i['id'] ?>">
-                        <div class="linha-topo">
-                            <div class="linha-info">
-                                <strong><?= e($i['arquivo']) ?></strong>
-                                <span class="meta"><?= num_br($i['linhas']) ?> linhas importadas · <?= num_br($i['ignoradas']) ?> ignoradas · <?= e(date('d/m/Y H:i', strtotime($i['criado_em']))) ?></span>
-                            </div>
-                            <button type="button" class="btn btn-sec btn-sm" data-acao="excluir-imp">Desfazer importação</button>
-                        </div>
-                    </li>
-<?php endforeach; ?>
-                </ul>
-<?php endif; ?>
-            </section>
-
             <form method="get" class="filtro-autor">
                 <label for="autor">Ver vendas de</label>
                 <select id="autor" name="autor" onchange="this.form.submit()">
@@ -98,13 +72,13 @@ layout_inicio('Vendas', 'vendas', $usuario);
 <?php if ((int) $tot['q'] === 0 && (float) $tot['r'] === 0.0): ?>
             <div class="vazio">
                 <strong>Nenhuma venda ainda</strong>
-                <?= $editora ? 'Importe um relatório de vendas acima para ver os números.' : 'Quando a editora importar o relatório de vendas, os seus números aparecem aqui.' ?>
+                <?= $editora ? 'Importe um relatório de vendas abaixo para ver os números.' : 'Quando a editora importar o relatório de vendas, os seus números aparecem aqui.' ?>
             </div>
 <?php else: ?>
             <div class="numeros">
-                <div><strong><?= num_br($tot['q']) ?></strong><span>exemplares vendidos</span></div>
+                <div class="destaque"><strong><?= e(brl($tot['r'])) ?></strong><span>receita do autor</span></div>
                 <div><strong><?= e(brl($tot['b'])) ?></strong><span>vendas brutas</span></div>
-                <div><strong><?= e(brl($tot['r'])) ?></strong><span>receita do autor</span></div>
+                <div><strong><?= num_br($tot['q']) ?></strong><span>exemplares vendidos</span></div>
             </div>
 
             <section class="bloco">
@@ -150,6 +124,35 @@ layout_inicio('Vendas', 'vendas', $usuario);
                     </table>
                 </div>
             </section>
+<?php endif; ?>
+
+<?php if ($editora): ?>
+            <details class="importar todas"<?= $semVendas ? ' open' : '' ?>>
+                <summary>Importar relatório de vendas</summary>
+                <p class="texto-2">Envie um arquivo CSV com as colunas <strong>autor_email, livro, canal, data, quantidade, valor_bruto, receita_autor</strong>. O e-mail precisa ser o mesmo do cadastro do autor.</p>
+                <div class="linha-acoes">
+                    <label for="csv" class="btn btn-sec btn-sm" id="rotulo-csv">Enviar arquivo CSV</label>
+                    <input type="file" id="csv" accept=".csv,text/csv" hidden>
+                    <a class="btn btn-sec btn-sm" href="vendas_modelo.php">Baixar modelo de CSV</a>
+                </div>
+                <p id="imp-resultado" class="texto-2" aria-live="polite"></p>
+                <p id="imp-erro" class="alerta" role="alert" hidden></p>
+<?php if ($importacoes): ?>
+                <ul class="lista-audios">
+<?php foreach ($importacoes as $i): ?>
+                    <li class="linha-audio" data-id="<?= (int) $i['id'] ?>">
+                        <div class="linha-topo">
+                            <div class="linha-info">
+                                <strong><?= e($i['arquivo']) ?></strong>
+                                <span class="meta"><?= num_br($i['linhas']) ?> linhas importadas · <?= num_br($i['ignoradas']) ?> ignoradas · <?= e(date('d/m/Y H:i', strtotime($i['criado_em']))) ?></span>
+                            </div>
+                            <button type="button" class="btn btn-sec btn-sm" data-acao="excluir-imp">Desfazer importação</button>
+                        </div>
+                    </li>
+<?php endforeach; ?>
+                </ul>
+<?php endif; ?>
+            </details>
 <?php endif; ?>
         </div>
 <?php if ($editora): ?>

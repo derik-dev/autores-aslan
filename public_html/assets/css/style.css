@@ -250,10 +250,9 @@ a.btn { text-decoration: none; }
 .chip-neutro::before { background: transparent; box-shadow: none; border: 1.5px solid currentColor; width: 7px; height: 7px; }
 
 /* ---------- Seções ---------- */
-.bloco { margin-top: 36px; padding-top: 22px; border-top: 1px solid var(--border); }
-.page-title + .texto-2 + .bloco,
-.page-title + .bloco { margin-top: 24px; }
-.bloco-titulo { font-size: 15px; font-weight: 600; margin: 0 0 12px; }
+.bloco { margin-top: 36px; }
+.page-title + .texto-2 + .bloco, .page-title + .bloco { margin-top: 28px; }
+.bloco-titulo { font-size: 18px; font-weight: 600; letter-spacing: -0.01em; line-height: 1.3; margin: 0 0 14px; }
 
 .duas-colunas { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .coluna { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
@@ -435,3 +434,35 @@ a.btn { text-decoration: none; }
 @media (max-width: 1100px) {
   #audio-app, #trad-app, #ent-app, #arc-app, #rel-app, #aut-app, #insp-app, #vendas-app { display: block; }
 }
+
+/* ---------- Hierarquia ---------- */
+/* Área de trabalho (formulário) em painel; a lista fica no fundo, como área secundária */
+:is(#audio-app, #trad-app, #ent-app, #arc-app, #rel-app, #aut-app, #insp-app) > .bloco:first-child,
+:is(#audio-app, #trad-app, #ent-app, #arc-app, #rel-app, #aut-app, #insp-app) > #andamento {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px 24px 28px;
+}
+:is(#audio-app, #trad-app, #ent-app, #arc-app, #rel-app, #aut-app, #insp-app) > #andamento { margin-top: 16px; }
+:is(#audio-app, #trad-app, #ent-app, #arc-app, #rel-app, #aut-app, #insp-app) > .bloco:last-child .bloco-titulo { color: var(--text); }
+.bloco-titulo + .form { margin-top: 0; }
+.bloco .texto-2:first-of-type { margin-top: 0; }
+
+/* Vendas: o número principal domina */
+.numeros { align-items: flex-end; }
+.numeros > div { flex: 1 1 200px; }
+.numeros .destaque { flex: 1.6 1 300px; }
+.numeros .destaque strong { font-size: 40px; letter-spacing: -0.02em; }
+.numeros > div:not(.destaque) strong { font-size: 22px; }
+
+/* Ferramenta ocasional (importar): recolhida, com aparência de apoio */
+details.importar { margin-top: 44px; border-top: 1px solid var(--border); padding-top: 16px; }
+details.importar > summary { display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 600; list-style: none; width: fit-content; }
+details.importar > summary::-webkit-details-marker { display: none; }
+details.importar > summary::before { content: "+"; width: 18px; height: 18px; display: grid; place-items: center; border: 1px solid var(--border-strong); border-radius: 4px; font-weight: 400; line-height: 1; }
+details.importar[open] > summary::before { content: "−"; }
+details.importar > :not(summary) { margin-top: 12px; }
+
+/* Início: o que está em andamento vem antes e pesa mais que o índice */
+.indice-destaque .indice-titulo { font-size: 18px; color: var(--text); letter-spacing: -0.01em; margin-bottom: 10px; }
