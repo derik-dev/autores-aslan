@@ -240,6 +240,8 @@
       var painel = $('an-painel-conversas'), lista = $('an-lista-conversas');
       if (!painel || !lista || !id) return;
       painel.hidden = false;
+      var sem = $('an-sem-conversas');
+      if (sem) sem.remove();
       lista.querySelectorAll('a').forEach(function (a) { a.classList.remove('ativo'); });
       var li = lista.querySelector('li[data-id="' + id + '"]');
       var novo = !li;
@@ -345,9 +347,6 @@
       if (ev.key === 'Enter' && !ev.shiftKey && !ev.isComposing) { ev.preventDefault(); perguntar(caixa.value); }
     });
     caixa.addEventListener('input', ajustarCaixa);
-    document.querySelectorAll('.an-sugestao').forEach(function (b) {
-      b.addEventListener('click', function () { perguntar(b.getAttribute('data-pergunta')); });
-    });
 
     var excluir = $('an-excluir-conversa');
     if (excluir) {

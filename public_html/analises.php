@@ -28,7 +28,7 @@ try {
     $s->execute([$usuario['id']]);
     $relatorios = $s->fetchAll();
 
-    $s = $pdo->prepare('SELECT id, titulo, atualizado_em FROM analise_conversas WHERE usuario_id = ? ORDER BY atualizado_em DESC, id DESC LIMIT 20');
+    $s = $pdo->prepare('SELECT id, titulo, atualizado_em FROM analise_conversas WHERE usuario_id = ? ORDER BY atualizado_em DESC, id DESC LIMIT 100');
     $s->execute([$usuario['id']]);
     $conversas = $s->fetchAll();
 
@@ -55,18 +55,6 @@ $temVendas = (int) $resumo['n'] > 0;
 $mes = function (?string $d): string {
     return $d ? date('m/Y', strtotime($d)) : '';
 };
-
-$sugestoes = [
-    'Qual foi o meu melhor mês e o que pode explicá-lo?',
-    'Qual livro mais contribui para a receita e qual está perdendo força?',
-    'Compare os meus canais de venda.',
-    'Quanto devo receber nos próximos 3 meses, no ritmo atual?',
-    'Algum mês fugiu do padrão?',
-    'O que eu faria para aumentar a receita?',
-];
-if ($editora) {
-    array_splice($sugestoes, 3, 0, ['Qual autor concentra mais receita?']);
-}
 
 layout_inicio('Análises', 'analises', $usuario);
 ?>
@@ -107,7 +95,7 @@ layout_inicio('Análises', 'analises', $usuario);
 <?php if (!$mensagens): ?>
                         <div class="an-vazio" id="an-vazio">
                             <strong>Pergunte o que quiser sobre as suas vendas</strong>
-                            Eu leio os números importados e respondo com evidências. Escolha uma pergunta ao lado ou escreva a sua.
+                            Eu leio os números importados e respondo com evidências. Escreva a sua pergunta abaixo.
                         </div>
 <?php endif; ?>
 <?php foreach ($mensagens as $m): ?>
@@ -144,17 +132,11 @@ layout_inicio('Análises', 'analises', $usuario);
 <?php endif; ?>
                     </section>
 
-                    <section class="bloco">
-                        <h2 class="bloco-titulo">Perguntas para começar</h2>
-                        <div class="an-sugestoes">
-<?php foreach ($sugestoes as $q): ?>
-                            <button type="button" class="an-sugestao" data-pergunta="<?= e($q) ?>"><?= e($q) ?></button>
-<?php endforeach; ?>
-                        </div>
-                    </section>
-
-                    <section class="bloco" id="an-painel-conversas"<?= $conversas ? '' : ' hidden' ?>>
-                        <h2 class="bloco-titulo">Conversas anteriores</h2>
+                    <section class="bloco an-historico" id="an-painel-conversas">
+                        <h2 class="bloco-titulo">Histórico de conversas</h2>
+<?php if (!$conversas): ?>
+                        <p class="texto-2" id="an-sem-conversas">As suas conversas aparecem aqui.</p>
+<?php endif; ?>
                         <ul class="an-lista" id="an-lista-conversas">
 <?php foreach ($conversas as $c): ?>
                             <li data-id="<?= (int) $c['id'] ?>"><a href="analises.php?modo=conversa&amp;c=<?= (int) $c['id'] ?>" class="<?= ($conversa && (int) $conversa['id'] === (int) $c['id']) ? 'ativo' : '' ?>"><span><?= e($c['titulo']) ?></span><small><?= e(date('d/m/Y', strtotime($c['atualizado_em']))) ?></small></a></li>

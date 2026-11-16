@@ -677,3 +677,19 @@ details.importar { margin-top: 16px; padding: 14px 20px; }
   .an-msg-nova, .an-digitando { animation: none; }
   .an-cursor { animation: none; }
 }
+
+/* ---------- Histórico de conversas com rolagem própria ---------- */
+.an-grade-chat { align-items: stretch; }
+.an-grade-chat .an-lateral { height: calc(100vh - 230px); min-height: 520px; }
+.an-lateral .an-historico { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.an-historico .an-lista { flex: 1; min-height: 0; overflow-y: auto; margin-right: -12px; padding-right: 12px; scrollbar-width: thin; scrollbar-color: var(--border-strong) transparent; }
+.an-historico .an-lista::-webkit-scrollbar { width: 8px; }
+.an-historico .an-lista::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+.an-historico .an-lista a span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.an-historico > .texto-2 { margin: 0; }
+
+@media (max-width: 1100px) {
+  .an-grade-chat .an-lateral { height: auto; min-height: 0; }
+  .an-lateral .an-historico { flex: none; }
+  .an-historico .an-lista { max-height: 320px; }
+}
