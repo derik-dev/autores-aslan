@@ -385,3 +385,4 @@ a.btn { text-decoration: none; }
 
 /* Algarismos de mesma largura só onde há números alinhados */
 .tabela, .numeros, .barra-valor, .meta, .lista-barras { font-variant-numeric: tabular-nums; }
+.indice-nome { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

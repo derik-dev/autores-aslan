@@ -19,9 +19,57 @@ $descricoes = [
     'autores'    => 'Crie contas de autor e redefina senhas.',
 ];
 
+// "Continue de onde parou": áudios e traduções/revisões que ainda não terminaram.
+$andamento = [];
+try {
+    $pdo = db();
+    $s = $pdo->prepare("SELECT id, titulo, status FROM audios WHERE usuario_id = ? AND status <> 'concluido' ORDER BY id DESC LIMIT 4");
+    $s->execute([$usuario['id']]);
+    foreach ($s->fetchAll() as $a) {
+        $andamento[] = ['audio', 'audio.php', $a['titulo'], $a['status'] === 'erro' ? 'Áudio com erro: abra para continuar' : 'Áudio incompleto: continue a gerar'];
+    }
+
+    $s = $pdo->prepare(
+        'SELECT t.id, t.titulo, t.idioma, COUNT(p.id) AS total, COALESCE(SUM(p.feito), 0) AS feitos, COALESCE(SUM(p.aprovado), 0) AS aprovados
+         FROM traducoes t LEFT JOIN traducao_trechos p ON p.traducao_id = t.id
+         WHERE t.usuario_id = ? GROUP BY t.id
+         HAVING feitos < total OR aprovados < total
+         ORDER BY t.id DESC LIMIT 6'
+    );
+    $s->execute([$usuario['id']]);
+    foreach ($s->fetchAll() as $t) {
+        $rev   = $t['idioma'] === 'rev';
+        $total = (int) $t['total'];
+        if ((int) $t['feitos'] < $total) {
+            $andamento[] = [$rev ? 'revisao' : 'traducao', $rev ? 'revisao.php' : 'traducao.php', $t['titulo'], ($rev ? 'Revisão' : 'Tradução') . ' incompleta: ' . (int) $t['feitos'] . ' de ' . $total . ' trechos'];
+        } else {
+            $andamento[] = [$rev ? 'revisao' : 'traducao', 'traducao_revisar.php?id=' . (int) $t['id'], $t['titulo'], 'Para aprovar: ' . ($total - (int) $t['aprovados']) . ' de ' . $total . ' trechos'];
+        }
+    }
+} catch (Throwable $e) {
+    $andamento = [];
+}
+
 layout_inicio('Início', 'index', $usuario);
 ?>
         <p class="texto-2">Olá, <?= e($usuario['nome']) ?>. Escolha uma função para começar.</p>
+
+<?php if ($andamento): ?>
+        <section class="indice-grupo">
+            <h2 class="indice-titulo">Continue de onde parou</h2>
+            <ul class="indice">
+<?php foreach ($andamento as [$chave, $link, $nome, $situacao]): [, , $ico] = MENU[$chave]; ?>
+                <li>
+                    <a class="indice-item" href="<?= e($link) ?>">
+                        <?= icone($ico) ?>
+                        <span class="indice-nome"><?= e($nome) ?></span>
+                        <span class="indice-desc"><?= e($situacao) ?></span>
+                    </a>
+                </li>
+<?php endforeach; ?>
+            </ul>
+        </section>
+<?php endif; ?>
 
 <?php foreach (MENU_GRUPOS as $grupo => $chaves): ?>
 <?php if (in_array('autores', $chaves, true) && !eh_editora($usuario)) { continue; } ?>
