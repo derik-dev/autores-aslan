@@ -250,7 +250,7 @@ a.btn { text-decoration: none; }
 .chip-neutro::before { background: transparent; box-shadow: none; border: 1.5px solid currentColor; width: 7px; height: 7px; }
 
 /* ---------- Seções ---------- */
-.bloco { margin-top: 36px; }
+.bloco { margin-top: 20px; }
 .page-title + .texto-2 + .bloco, .page-title + .bloco { margin-top: 28px; }
 .bloco-titulo { font-size: 18px; font-weight: 600; letter-spacing: -0.01em; line-height: 1.3; margin: 0 0 14px; }
 
@@ -265,7 +265,7 @@ a.btn { text-decoration: none; }
 .barra-audio i { display: block; height: 100%; width: 0; background: var(--brand); transition: width .3s; }
 
 /* ---------- Listas em linhas (áudios, traduções, entregas…) ---------- */
-.lista-audios { list-style: none; margin: 4px 0 0; padding: 0; border-bottom: 1px solid var(--border); }
+.lista-audios { list-style: none; margin: 0; padding: 0; }
 .linha-audio { border-top: 1px solid var(--border); padding: 16px 0; display: flex; flex-direction: column; gap: 10px; }
 .linha-topo { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
 .linha-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
@@ -415,7 +415,7 @@ a.btn { text-decoration: none; }
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
   grid-template-areas: "form lista" "prog lista";
   grid-template-rows: auto 1fr;
-  column-gap: 56px;
+  column-gap: 24px;
   align-items: start;
 }
 :is(#audio-app, #trad-app, #ent-app, #arc-app, #rel-app, #aut-app, #insp-app) > .bloco:first-child { grid-area: form; }
@@ -423,11 +423,11 @@ a.btn { text-decoration: none; }
 :is(#audio-app, #trad-app, #ent-app, #arc-app, #rel-app, #aut-app, #insp-app) > .bloco:last-child { grid-area: lista; }
 
 /* Vendas: números e tabelas largas ocupam a linha toda; mês e canal ficam lado a lado */
-#vendas-app { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 56px; align-items: start; }
+#vendas-app { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 24px; align-items: start; }
 #vendas-app > .todas, #vendas-app > .numeros, #vendas-app > .filtro-autor, #vendas-app > .vazio { grid-column: 1 / -1; }
 
 /* Início: grupos de funções em colunas */
-.indice-grade { display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); column-gap: 56px; align-items: start; }
+.indice-grade { display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); column-gap: 24px; align-items: start; }
 .indice-grade .indice-grupo { margin-top: 32px; }
 .indice-item { grid-template-columns: 18px minmax(110px, 160px) 1fr; }
 
@@ -436,17 +436,6 @@ a.btn { text-decoration: none; }
 }
 
 /* ---------- Hierarquia ---------- */
-/* Área de trabalho (formulário) em painel; a lista fica no fundo, como área secundária */
-:is(#audio-app, #trad-app, #ent-app, #arc-app, #rel-app, #aut-app, #insp-app) > .bloco:first-child,
-:is(#audio-app, #trad-app, #ent-app, #arc-app, #rel-app, #aut-app, #insp-app) > #andamento {
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 24px 24px 28px;
-}
-:is(#audio-app, #trad-app, #ent-app, #arc-app, #rel-app, #aut-app, #insp-app) > #andamento { margin-top: 16px; }
-:is(#audio-app, #trad-app, #ent-app, #arc-app, #rel-app, #aut-app, #insp-app) > .bloco:last-child .bloco-titulo { color: var(--text); }
-.bloco-titulo + .form { margin-top: 0; }
 .bloco .texto-2:first-of-type { margin-top: 0; }
 
 /* Vendas: o número principal domina */
@@ -466,3 +455,51 @@ details.importar > :not(summary) { margin-top: 12px; }
 
 /* Início: o que está em andamento vem antes e pesa mais que o índice */
 .indice-destaque .indice-titulo { font-size: 18px; color: var(--text); letter-spacing: -0.01em; margin-bottom: 10px; }
+
+/* ---------- Painéis: cada grupo de informação tem caixa, cabeçalho e espaço próprios ---------- */
+.bloco {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0 24px 24px;
+}
+.bloco-titulo {
+  margin: 0 -24px 20px;
+  padding: 16px 24px 14px;
+  border-bottom: 1px solid var(--border);
+  background: #FCFAF7;
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+.bloco > .texto-2:first-of-type { margin-top: 0; }
+.bloco .lista-audios .linha-audio:first-child { border-top: 0; padding-top: 0; }
+.bloco .vazio { border-top: 0; padding: 4px 0 0; }
+.page-title + .texto-2 { margin-bottom: 8px; }
+
+/* Números de destaque num painel só, com divisórias */
+.numeros { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); margin-top: 20px; }
+.numeros > div { padding: 22px 24px; }
+.numeros > div + div { padding-left: 24px; border-left: 1px solid var(--border); }
+
+/* Início: cada grupo de funções num painel */
+.indice-grupo { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 0 24px 8px; margin-top: 20px; }
+.indice-titulo { margin: 0 -24px 6px; padding: 14px 24px 12px; border-bottom: 1px solid var(--border); background: #FCFAF7; border-radius: var(--radius) var(--radius) 0 0; }
+.indice { border-top: 0; }
+.indice li:last-child { border-bottom: 0; }
+.indice-item { margin: 0 -12px; padding: 13px 12px; }
+.indice-grade { column-gap: 24px; }
+.indice-grade .indice-grupo { margin-top: 20px; }
+.indice-destaque .indice-titulo { font-size: 16px; margin-bottom: 6px; }
+
+/* Ferramenta recolhida também em painel */
+details.importar { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 24px; margin-top: 20px; }
+
+/* Filtro acima dos painéis */
+.filtro-autor { margin: 20px 0 0; }
+
+/* Revisão lado a lado: barra e blocos já são painéis; só alinha o espaço */
+.trad-bloco { margin-bottom: 20px; }
+
+/* Painéis lado a lado com a mesma altura; o grupo Editora ocupa a linha de baixo inteira */
+#vendas-app { align-items: stretch; }
+.indice-grade { align-items: stretch; }
+.indice-grade .indice-editora { grid-column: 1 / -1; }

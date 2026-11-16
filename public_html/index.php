@@ -74,7 +74,7 @@ layout_inicio('Início', 'index', $usuario);
         <div class="indice-grade">
 <?php foreach (MENU_GRUPOS as $grupo => $chaves): ?>
 <?php if (in_array('autores', $chaves, true) && !eh_editora($usuario)) { continue; } ?>
-        <section class="indice-grupo">
+        <section class="indice-grupo<?= in_array('autores', $chaves, true) ? ' indice-editora' : '' ?>">
             <h2 class="indice-titulo"><?= e($grupo) ?></h2>
             <ul class="indice">
 <?php foreach ($chaves as $chave): [$rotulo, $link, $ico] = MENU[$chave]; ?>
