@@ -14,7 +14,7 @@ $descricoes = [
     'entregas'   => 'Envie o livro por link seguro, com validade e limite.',
     'exemplares' => 'Monte um grupo de leitores antes do lançamento.',
     'vendas'     => 'Acompanhe vendas e receitas por mês, livro e canal.',
-    'analises'   => 'A IA lê os números e aponta destaques e alertas.',
+    'analises'   => 'Converse com um analista ou gere relatórios sobre as vendas.',
     'mercado'    => 'Ideias de palavras-chave, categorias e posicionamento.',
     'autores'    => 'Crie contas de autor e redefina senhas.',
 ];

@@ -191,3 +191,27 @@ CREATE TABLE IF NOT EXISTS arc_leitores (
     UNIQUE KEY uq_arc_email (arc_id, email),
     CONSTRAINT fk_leitores_arc FOREIGN KEY (arc_id) REFERENCES arcs(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ---------- Análises: conversa livre sobre as vendas ----------
+
+CREATE TABLE IF NOT EXISTS analise_conversas (
+    id             INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    usuario_id     INT UNSIGNED NOT NULL,
+    titulo         VARCHAR(120) NOT NULL DEFAULT 'Nova conversa',
+    autor_filtro   INT UNSIGNED NOT NULL DEFAULT 0,
+    relatorio_id   INT UNSIGNED NULL,
+    criado_em      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    atualizado_em  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    KEY idx_conversas_usuario (usuario_id, atualizado_em),
+    CONSTRAINT fk_conversas_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS analise_mensagens (
+    id           INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    conversa_id  INT UNSIGNED NOT NULL,
+    papel        ENUM('user','assistant') NOT NULL,
+    conteudo     MEDIUMTEXT NOT NULL,
+    criado_em    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    KEY idx_mensagens_conversa (conversa_id, id),
+    CONSTRAINT fk_mensagens_conversa FOREIGN KEY (conversa_id) REFERENCES analise_conversas(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
