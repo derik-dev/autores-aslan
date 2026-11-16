@@ -93,7 +93,7 @@ layout_inicio('Análises', 'analises', $usuario);
                     <header class="an-chat-topo">
                         <div class="an-chat-titulo">
                             <strong id="an-chat-titulo"><?= $conversa ? e($conversa['titulo']) : 'Nova conversa' ?></strong>
-                            <span class="meta">Responde com base nas vendas importadas</span>
+                            <span class="meta">Lia responde com base nas vendas importadas</span>
                         </div>
                         <div class="linha-acoes">
                             <a class="btn btn-sec btn-sm" href="analises.php?modo=conversa">Nova conversa</a>
@@ -114,7 +114,7 @@ layout_inicio('Análises', 'analises', $usuario);
 <?php if ($m['papel'] === 'user'): ?>
                         <div class="an-msg an-msg-user"><div class="an-msg-papel">Você</div><div class="an-msg-texto"><?= e($m['conteudo']) ?></div></div>
 <?php else: ?>
-                        <div class="an-msg an-msg-ia"><div class="an-msg-papel">Analista</div><div class="an-msg-texto" data-md><?= e($m['conteudo']) ?></div></div>
+                        <div class="an-msg an-msg-ia"><div class="an-msg-papel">Lia</div><div class="an-msg-texto" data-md><?= e($m['conteudo']) ?></div></div>
 <?php endif; ?>
 <?php endforeach; ?>
                     </div>

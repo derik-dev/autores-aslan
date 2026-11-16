@@ -108,7 +108,7 @@
       m.className = 'an-msg an-msg-nova ' + (papel === 'user' ? 'an-msg-user' : 'an-msg-ia');
       var p = document.createElement('div');
       p.className = 'an-msg-papel';
-      p.textContent = papel === 'user' ? 'Você' : 'Analista';
+      p.textContent = papel === 'user' ? 'Você' : 'Lia';
       var t = document.createElement('div');
       t.className = 'an-msg-texto';
       if (ehHtml) t.innerHTML = html; else t.textContent = html;

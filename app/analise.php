@@ -417,21 +417,29 @@ function an_limpar_ia(array $ia): array
     ];
 }
 
-// Prompt de sistema da conversa: dados + regras + (opcional) o relatório que o usuário quer discutir.
+// Prompt de sistema da conversa: lê app/prompts/analista.txt (a persona "Lia") e preenche os dados desta conversa.
 function an_chat_sistema(array $fatos, string $escopo, string $tabela, ?array $relatorio): string
 {
-    $s = "Você é o analista de dados de uma editora de livros, conversando com quem acompanha as vendas. "
-        . "Responda em português do Brasil, de forma direta e profissional.\n"
-        . "Como responder: comece pela resposta; depois traga a evidência com números; se fizer sentido, termine com uma recomendação ou o próximo passo. "
-        . "Seja breve quando a pergunta for simples e detalhado quando for complexa. "
-        . "Se a pergunta for vaga, responda com o que dá para afirmar e diga o que precisaria saber. "
-        . "Formate com markdown simples: **negrito**, listas com hífen e, quando comparar itens, tabelas com | e linha de separação.\n\n"
-        . AN_REGRAS . "\n\n" . an_contexto($fatos, $escopo, $tabela);
+    $dados = an_contexto($fatos, $escopo, $tabela);
+    $blocoRelatorio = '';
     if ($relatorio !== null && isset($relatorio['ia'])) {
-        $s .= "\nO usuário quer conversar sobre este relatório já gerado (use-o como contexto, sem repeti-lo inteiro):\n<relatorio>\n"
-            . json_encode($relatorio['ia'], JSON_UNESCAPED_UNICODE) . "\n</relatorio>\n";
+        $blocoRelatorio = "O usuário quer conversar sobre este relatório já gerado (use-o como contexto, sem repeti-lo inteiro):\n<relatorio>\n"
+            . json_encode($relatorio['ia'], JSON_UNESCAPED_UNICODE) . "\n</relatorio>";
     }
-    return $s;
+
+    $arquivo = __DIR__ . '/prompts/analista.txt';
+    if (is_file($arquivo)) {
+        $modelo = (string) file_get_contents($arquivo);
+        return strtr($modelo, [
+            '{{DADOS}}'            => $dados,
+            '{{REGRAS_DE_DADOS}}'  => AN_REGRAS,
+            '{{RELATORIO}}'        => $blocoRelatorio,
+        ]);
+    }
+
+    // Reserva, caso o arquivo do prompt não exista.
+    return "Você é a Lia, analista de vendas de uma editora. Responda em português do Brasil, de forma direta e profissional, "
+        . "começando pela resposta e trazendo os números que a sustentam.\n\n" . AN_REGRAS . "\n\n" . $dados . "\n" . $blocoRelatorio;
 }
 
 // Título curto da conversa, criado pela IA a partir da primeira pergunta (e do começo da resposta).
