@@ -8,14 +8,15 @@
   var TRECHO = 3500;   // tem de ser igual a TRAD_TRECHO no PHP
 
   var $ = function (id) { return document.getElementById(id); };
-  var titulo = $('titulo'), texto = $('texto');
   var resumo = $('resumo'), erroForm = $('erro-form'), gerar = $('gerar');
-  var arquivo = $('arquivo'), rotuloArquivo = $('rotulo-arquivo');
+  var arquivo = $('arquivo'), soltar = $('rv-soltar'), soltarTitulo = $('rv-soltar-titulo'), rotuloArquivo = $('rotulo-arquivo');
   var painel = $('andamento'), andTitulo = $('and-titulo'), andBarra = $('and-barra');
   var andTexto = $('and-texto'), andErro = $('and-erro'), andTentar = $('and-tentar');
 
   var rodando = false;
   var ultimoId = null, ultimoTitulo = '';
+  var textoCarregado = '', tituloCarregado = '';
+  var TEXTO_INICIAL = rotuloArquivo.textContent;
 
   function fmt(n) { return Number(n).toLocaleString('pt-PT'); }
 
@@ -36,48 +37,65 @@
   function mostrarErro(el, mensagem) { el.textContent = mensagem; el.hidden = false; }
 
   function atualizarResumo() {
-    var n = texto.value.trim().length;
-    if (!n) { resumo.textContent = 'Ainda não há texto.'; return; }
+    var n = textoCarregado.trim().length;
+    if (!n) { resumo.hidden = true; return; }
     var trechos = Math.ceil(n / TRECHO);
     var paginas = Math.max(1, Math.round(n / PAGINA));
     var minutos = Math.max(1, Math.ceil(trechos * 40 / 60));
+    resumo.hidden = false;
     resumo.textContent = fmt(n) + ' caracteres (≈ ' + fmt(paginas) + ' páginas) · ' + fmt(trechos) + (trechos === 1 ? ' trecho' : ' trechos') + ' · demora ≈ ' + minutos + ' min a rever';
   }
-  texto.addEventListener('input', atualizarResumo);
 
-  arquivo.addEventListener('change', function () {
-    var f = arquivo.files[0];
-    if (!f) return;
+  function lerFicheiro(f) {
+    if (!f || rodando) return;
     erroForm.hidden = true;
-    var rotuloOriginal = rotuloArquivo.textContent;
-    rotuloArquivo.textContent = 'A ler o ficheiro…';
+    soltarTitulo.textContent = 'A ler o ficheiro…';
     var fd = new FormData();
     fd.append('arquivo', f);
     chamar('audio_api.php?acao=extrair', fd).then(function (j) {
-      rotuloArquivo.textContent = rotuloOriginal;
       arquivo.value = '';
-      if (!j.ok) { mostrarErro(erroForm, j.erro); return; }
-      texto.value = j.texto;
-      if (!titulo.value.trim()) titulo.value = f.name.replace(/\.[^.]+$/, '');
+      if (!j.ok) {
+        soltarTitulo.textContent = 'Carregar um ficheiro';
+        mostrarErro(erroForm, j.erro);
+        return;
+      }
+      textoCarregado = j.texto;
+      tituloCarregado = f.name.replace(/.[^.]+$/, '');
+      soltar.classList.add('rv-soltar-ok');
+      soltarTitulo.textContent = f.name;
+      rotuloArquivo.textContent = 'Carregue ou arraste outro ficheiro para o trocar.';
+      gerar.disabled = false;
       atualizarResumo();
     });
+  }
+  arquivo.addEventListener('change', function () { lerFicheiro(arquivo.files[0]); });
+  ['dragenter', 'dragover'].forEach(function (nome) {
+    soltar.addEventListener(nome, function (ev) { ev.preventDefault(); soltar.classList.add('rv-soltar-sobre'); });
+  });
+  ['dragleave', 'drop'].forEach(function (nome) {
+    soltar.addEventListener(nome, function (ev) { ev.preventDefault(); soltar.classList.remove('rv-soltar-sobre'); });
+  });
+  soltar.addEventListener('drop', function (ev) {
+    if (ev.dataTransfer && ev.dataTransfer.files && ev.dataTransfer.files[0]) lerFicheiro(ev.dataTransfer.files[0]);
+  });
+  soltar.addEventListener('keydown', function (ev) {
+    if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); arquivo.click(); }
   });
 
   gerar.addEventListener('click', function () {
     if (rodando) return;
     erroForm.hidden = true;
-    if (!titulo.value.trim()) { mostrarErro(erroForm, 'Dê um título ao texto.'); titulo.focus(); return; }
-    if (!texto.value.trim()) { mostrarErro(erroForm, 'Cole ou carregue o texto.'); texto.focus(); return; }
+    if (!textoCarregado.trim()) { mostrarErro(erroForm, 'Carregue primeiro um ficheiro.'); return; }
 
     gerar.disabled = true;
     gerar.textContent = 'A preparar o texto…';
     chamar('traducao_api.php?acao=criar', {
-      titulo: titulo.value.trim(), idioma: 'rev', instrucoes: '', texto: texto.value
+      titulo: tituloCarregado || 'Texto sem título', idioma: 'rev', instrucoes: '', texto: textoCarregado
     }).then(function (j) {
       gerar.disabled = false;
       gerar.textContent = 'Rever texto';
       if (!j.ok) { mostrarErro(erroForm, j.erro); return; }
-      processar(j.id, titulo.value.trim());
+      processar(j.id, tituloCarregado);
     });
   });
 

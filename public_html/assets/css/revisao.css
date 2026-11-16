@@ -124,3 +124,12 @@
 .rv-envio .rv-campo-texto { min-height: clamp(380px, 62vh, 720px); font-size: 16px; line-height: 1.7; padding: 16px 18px; resize: vertical; }
 .rv-envio #titulo { font-size: 16px; padding: 12px 14px; }
 @media (max-width: 640px) { .rv-envio .rv-campo-texto { min-height: 320px; padding: 12px; } }
+
+/* Envio por ficheiro: zona de largar */
+.rv-soltar { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; min-height: 220px; padding: 28px 20px; text-align: center; cursor: pointer; background: #FCFAF6; border: 1.5px dashed var(--bege-detalhe); border-radius: var(--radius); transition: background 0.2s, border-color 0.2s; }
+.rv-soltar strong { font-size: 18px; letter-spacing: -0.01em; overflow-wrap: anywhere; }
+.rv-soltar:hover, .rv-soltar:focus-visible, .rv-soltar-sobre { background: var(--hover); border-color: var(--brand); outline: none; }
+.rv-soltar-ok { border-style: solid; }
+.rv-envio #resumo { margin: 12px 0 0; }
+.rv-envio #gerar:disabled { opacity: 0.5; cursor: not-allowed; }
+.rv-soltar .texto-2 { font-weight: 400; font-size: 14.5px; max-width: 46ch; }

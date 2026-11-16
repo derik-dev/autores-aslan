@@ -40,7 +40,7 @@ layout_inicio('Revisão de textos', 'revisao', $usuario);
 echo '<link rel="stylesheet" href="' . asset_url('assets/css/revisao.css') . '">' . "
 ";
 ?>
-        <p class="texto-2">Cole ou carregue um texto. A IA corrige a ortografia, a acentuação, a gramática e a pontuação sem mudar o seu estilo, e mostra cada correção marcada no texto, com a explicação.</p>
+        <p class="texto-2">Carregue um ficheiro. A IA corrige a ortografia, a acentuação, a gramática e a pontuação sem mudar o seu estilo, e mostra cada correção marcada no texto, com a explicação.</p>
 
 <?php if (!$tabelasOk || !$tabelaCorrecoes): ?>
         <p class="alerta" role="alert">Faltam tabelas na base de dados. Importe o ficheiro <strong>database/schema.sql</strong> no phpMyAdmin e recarregue esta página.</p>
@@ -51,20 +51,16 @@ echo '<link rel="stylesheet" href="' . asset_url('assets/css/revisao.css') . '">
             <section class="bloco">
                 <h2 class="bloco-titulo">Novo texto para rever</h2>
                 <div class="form">
-                    <label for="titulo">Título</label>
-                    <input type="text" id="titulo" maxlength="200" placeholder="Ex.: Capítulo 3 – O regresso" autocomplete="off">
-
-                    <div class="rotulo-linha">
-                        <label for="texto">Texto</label>
-                        <label for="arquivo" class="btn btn-sec btn-sm" id="rotulo-arquivo">Carregar ficheiro (.txt ou .docx)</label>
-                        <input type="file" id="arquivo" accept=".txt,.docx" hidden>
-                    </div>
-                    <textarea id="texto" class="rv-campo-texto" rows="18" placeholder="Cole aqui o texto que quer rever…"></textarea>
-                    <p id="resumo" class="texto-2">Ainda não há texto.</p>
+                    <input type="file" id="arquivo" accept=".txt,.docx" hidden>
+                    <label for="arquivo" id="rv-soltar" class="rv-soltar" tabindex="0">
+                        <strong id="rv-soltar-titulo">Carregar um ficheiro</strong>
+                        <span class="texto-2" id="rotulo-arquivo">Arraste o ficheiro para aqui ou carregue para o escolher. Aceita .txt e .docx.</span>
+                    </label>
+                    <p id="resumo" class="texto-2" hidden></p>
 
                     <p id="erro-form" class="alerta" role="alert" hidden></p>
                     <div>
-                        <button type="button" id="gerar" class="btn btn-primary">Rever texto</button>
+                        <button type="button" id="gerar" class="btn btn-primary" disabled>Rever texto</button>
                     </div>
                 </div>
             </section>
@@ -82,7 +78,7 @@ echo '<link rel="stylesheet" href="' . asset_url('assets/css/revisao.css') . '">
 <?php if (!$itens): ?>
                 <div class="vazio">
                     <strong>Ainda não reviu nenhum texto</strong>
-                    Cole um texto e carregue em Rever texto. O resultado aparece aqui, com as correções marcadas.
+                    Carregue um ficheiro e depois em Rever texto. O resultado aparece aqui, com as correções marcadas.
                 </div>
 <?php else: ?>
                 <ul class="lista-audios">
