@@ -503,3 +503,43 @@ details.importar { background: var(--panel); border: 1px solid var(--border); bo
 #vendas-app { align-items: stretch; }
 .indice-grade { align-items: stretch; }
 .indice-grade .indice-editora { grid-column: 1 / -1; }
+
+/* ---------- Compactação: menos vazio, sem espremer ---------- */
+.bloco { margin-top: 16px; padding: 0 20px 20px; }
+.bloco-titulo { margin: 0 -20px 14px; padding: 12px 20px 11px; font-size: 17px; }
+.indice-grupo { padding: 0 20px 6px; margin-top: 16px; }
+.indice-titulo { margin: 0 -20px 4px; padding: 12px 20px 11px; }
+.indice-grade .indice-grupo { margin-top: 16px; }
+.indice-item { padding: 11px 12px; }
+.numeros { margin-top: 16px; }
+.numeros > div { padding: 18px 20px; }
+.numeros > div + div { padding-left: 20px; }
+:is(#audio-app, #trad-app, #ent-app, #arc-app, #rel-app, #aut-app, #insp-app, #vendas-app) { column-gap: 16px; }
+details.importar { margin-top: 16px; padding: 14px 20px; }
+.filtro-autor { margin: 16px 0 0; }
+
+/* Tabelas: colunas de números ficam coladas ao conteúdo, sem esticar até a borda */
+.tabela th { padding: 6px 16px 6px 0; }
+.tabela td { padding: 9px 16px 9px 0; }
+.tabela-num th:not(:first-child), .tabela-num td:not(:first-child) { width: 1%; white-space: nowrap; padding-left: 28px; }
+
+/* Vendas: grade de 12 colunas. 1º nível: totais. 2º: tendência e destaques. 3º: livro e canal. */
+#vendas-app { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+#vendas-app > .col-7 { grid-column: span 7; }
+#vendas-app > .col-5 { grid-column: span 5; }
+#vendas-app > .todas, #vendas-app > .numeros, #vendas-app > .filtro-autor, #vendas-app > .vazio { grid-column: 1 / -1; }
+
+/* Os três totais têm o mesmo tamanho */
+.numeros .destaque strong, .numeros > div:not(.destaque) strong, .numeros strong { font-size: 30px; letter-spacing: -0.02em; }
+.numeros > div, .numeros .destaque { flex: 1 1 200px; }
+
+/* Destaques: pares valor + legenda, em 2 colunas */
+.mini-numeros { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 20px; }
+.mini-numeros > div { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.mini-numeros strong { font-size: 20px; font-weight: 600; letter-spacing: -0.01em; line-height: 1.25; }
+.mini-numeros strong.quebra { font-size: 16px; overflow-wrap: anywhere; }
+.mini-numeros span { color: var(--text-2); font-size: 13px; }
+
+@media (max-width: 1100px) {
+  #audio-app, #trad-app, #ent-app, #arc-app, #rel-app, #aut-app, #insp-app, #vendas-app { display: block; }
+}

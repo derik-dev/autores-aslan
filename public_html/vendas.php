@@ -47,6 +47,18 @@ foreach ($mensal as $m) {
     $maxReceita = max($maxReceita, (float) $m['r']);
 }
 
+
+// Destaques: o que mais importa depois dos totais.
+$melhorMes = null;
+foreach ($mensal as $m) {
+    if ($melhorMes === null || (float) $m['r'] > (float) $melhorMes['r']) {
+        $melhorMes = $m;
+    }
+}
+$livroLider   = $porLivro[0] ?? null;
+$ticketMedio  = (int) $tot['q'] > 0 ? (float) $tot['b'] / (int) $tot['q'] : 0.0;
+$participacao = (float) $tot['b'] > 0 ? (float) $tot['r'] / (float) $tot['b'] * 100 : 0.0;
+
 layout_inicio('Vendas', 'vendas', $usuario);
 ?>
         <p class="texto-2"><?= $editora ? 'Importe os relatórios de vendas e acompanhe a receita de cada autor.' : 'Acompanhe quanto os seus livros venderam e quanto você recebe.' ?></p>
@@ -76,12 +88,12 @@ layout_inicio('Vendas', 'vendas', $usuario);
             </div>
 <?php else: ?>
             <div class="numeros">
-                <div class="destaque"><strong><?= e(brl($tot['r'])) ?></strong><span>receita do autor</span></div>
+                <div><strong><?= e(brl($tot['r'])) ?></strong><span>receita do autor</span></div>
                 <div><strong><?= e(brl($tot['b'])) ?></strong><span>vendas brutas</span></div>
                 <div><strong><?= num_br($tot['q']) ?></strong><span>exemplares vendidos</span></div>
             </div>
 
-            <section class="bloco">
+            <section class="bloco col-7">
                 <h2 class="bloco-titulo">Receita por mês</h2>
                 <ul class="lista-barras">
 <?php foreach ($mensal as $m):
@@ -97,7 +109,35 @@ layout_inicio('Vendas', 'vendas', $usuario);
                 </ul>
             </section>
 
-            <section class="bloco">
+            <section class="bloco col-5">
+                <h2 class="bloco-titulo">Destaques</h2>
+                <div class="mini-numeros">
+<?php if ($melhorMes): [$a, $mm] = explode('-', $melhorMes['m']); ?>
+                    <div><strong><?= e($mm . '/' . $a) ?></strong><span>melhor mês · <?= e(brl($melhorMes['r'])) ?></span></div>
+<?php endif; ?>
+<?php if ($livroLider): ?>
+                    <div><strong class="quebra"><?= e($livroLider['livro']) ?></strong><span>livro que mais rendeu · <?= e(brl($livroLider['r'])) ?></span></div>
+<?php endif; ?>
+                    <div><strong><?= e(brl($ticketMedio)) ?></strong><span>vendas brutas por exemplar</span></div>
+                    <div><strong><?= e(number_format($participacao, 0, ',', '.')) ?>%</strong><span>das vendas brutas ficam com o autor</span></div>
+                </div>
+            </section>
+
+            <section class="bloco col-7">
+                <h2 class="bloco-titulo">Por livro</h2>
+                <div class="tabela-rolagem">
+                    <table class="tabela tabela-num">
+                        <thead><tr><th>Livro</th><th>Exemplares</th><th>Vendas brutas</th><th>Receita do autor</th></tr></thead>
+                        <tbody>
+<?php foreach ($porLivro as $l): ?>
+                            <tr><td><?= e($l['livro']) ?></td><td><?= num_br($l['q']) ?></td><td><?= e(brl($l['b'])) ?></td><td><?= e(brl($l['r'])) ?></td></tr>
+<?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="bloco col-5">
                 <h2 class="bloco-titulo">Por canal de venda</h2>
                 <div class="tabela-rolagem">
                     <table class="tabela tabela-num">
@@ -111,19 +151,9 @@ layout_inicio('Vendas', 'vendas', $usuario);
                 </div>
             </section>
 
-            <section class="bloco todas">
-                <h2 class="bloco-titulo">Por livro</h2>
-                <div class="tabela-rolagem">
-                    <table class="tabela tabela-num">
-                        <thead><tr><th>Livro</th><th>Exemplares</th><th>Vendas brutas</th><th>Receita do autor</th></tr></thead>
-                        <tbody>
-<?php foreach ($porLivro as $l): ?>
-                            <tr><td><?= e($l['livro']) ?></td><td><?= num_br($l['q']) ?></td><td><?= e(brl($l['b'])) ?></td><td><?= e(brl($l['r'])) ?></td></tr>
-<?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
+            
+
+            
 <?php endif; ?>
 
 <?php if ($editora): ?>
