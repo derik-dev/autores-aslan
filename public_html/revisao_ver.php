@@ -89,7 +89,7 @@ if (!$trad):
                     <button type="button" class="pr-aba" role="tab" data-vista="final">Texto final</button>
                     <button type="button" class="pr-aba" role="tab" data-vista="original">Original</button>
                     <span class="pr-espaco"></span>
-                    <button type="button" class="btn btn-sec btn-sm" id="rv-aceitar-todas">Aceitar todas</button>
+                    <button type="button" class="btn btn-sec btn-sm" id="rv-aceitar-todas" title="Aceita todas as correções de erros. As sugestões ficam à sua escolha.">Aceitar todas as correções</button>
                     <button type="button" class="btn btn-primary btn-sm" id="pr-concluir">Concluir revisão</button>
                 </div>
             </header>

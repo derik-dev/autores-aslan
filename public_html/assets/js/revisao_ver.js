@@ -61,9 +61,16 @@
   });
 
   // ---------- Contagens ----------
+  function ehSug(a) { return a.k === 'sugestao'; }
+  // Entra no texto final: aceite, ou correção de erro ainda por rever (as sugestões só se forem aceites)
+  function aplica(a) { return a.e === 'aceite' || (a.e === 'pendente' && !ehSug(a)); }
   function contar() {
-    var c = { pendente: 0, aceite: 0, rejeitada: 0 };
-    alts.forEach(function (a) { c[a.e]++; });
+    var c = { pendente: 0, aceite: 0, rejeitada: 0, errosPend: 0, sugPend: 0, sug: 0 };
+    alts.forEach(function (a) {
+      c[a.e]++;
+      if (ehSug(a)) { c.sug++; if (a.e === 'pendente') c.sugPend++; }
+      else if (a.e === 'pendente') c.errosPend++;
+    });
     return c;
   }
   function atualizarContagem() {
@@ -71,13 +78,13 @@
     $('rv-titulo-contagem').textContent = String(total);
     $('rv-detalhe-contagem').textContent = total === 0
       ? 'O texto não precisou de alterações.'
-      : resolvidas + ' de ' + total + ' correções resolvidas · ' + c.aceite + (c.aceite === 1 ? ' aceite' : ' aceites') + ' · ' + c.rejeitada + (c.rejeitada === 1 ? ' mantida como estava' : ' mantidas como estavam') + ' · ' + c.pendente + ' por rever';
+      : resolvidas + ' de ' + total + ' resolvidas · ' + c.errosPend + (c.errosPend === 1 ? ' correção por rever' : ' correções por rever') + (c.sug ? ' · ' + c.sugPend + (c.sugPend === 1 ? ' sugestão por decidir' : ' sugestões por decidir') : '');
     $('pr-barra').style.width = (total ? Math.round(resolvidas / total * 100) : 100) + '%';
     var est = $('pr-estado');
     var feita = c.pendente === 0;
     est.textContent = feita ? 'Revisão concluída' : 'Em revisão';
     est.className = 'chip ' + (feita ? 'chip-ok' : 'chip-neutro');
-    $('rv-aceitar-todas').disabled = c.pendente === 0;
+    $('rv-aceitar-todas').disabled = c.errosPend === 0;
     filtrosEl.querySelectorAll('[data-chip-pendentes] .rv-chip-n').forEach(function (s) { s.textContent = c.pendente; });
   }
 
@@ -89,20 +96,20 @@
     l.alts.forEach(function (a) {
       if (a.pos > cursor) frag.appendChild(document.createTextNode(l.texto.slice(cursor - l.ini, a.pos - l.ini)));
       var fimA = Math.min(a.pos + a.tam, l.fim);
-      var conteudo, marcar = true;
+      var conteudo, cls = null, sug = ehSug(a);
       if (lado === 'antes') {
         conteudo = a.o.split('\n')[0];
-        if (conteudo === '') marcar = false;
-      } else if (a.e === 'rejeitada') {
-        conteudo = a.o.split('\n')[0];
-        marcar = false;
-      } else {
+        if (conteudo !== '') cls = sug ? 'pr-sugm' : 'pr-del';
+      } else if (aplica(a)) {
         conteudo = a.c;
-        if (conteudo === '') marcar = false;
+        if (conteudo !== '') cls = 'pr-ins';
+      } else {
+        conteudo = a.o.split('\n')[0];
+        if (sug && a.e === 'pendente' && conteudo !== '') cls = 'pr-sugm';
       }
       if (conteudo !== '') {
-        if (marcar) {
-          var b = el('button', 'pr-marca ' + (lado === 'antes' ? 'pr-del' : 'pr-ins'), conteudo);
+        if (cls) {
+          var b = el('button', 'pr-marca ' + cls, conteudo);
           b.type = 'button';
           b.setAttribute('data-id', a.id);
           b.setAttribute('aria-label', 'Ir ao comentário da correção ' + a.n);
@@ -120,7 +127,7 @@
   function criarLinha(n, sinal, cls) {
     var r = el('div', 'pr-linha ' + cls);
     r.appendChild(el('span', 'pr-num', sinal === '+' ? '' : String(n)));
-    r.appendChild(el('span', 'pr-sinal', sinal === '=' ? '' : (sinal === '-' ? '−' : '+')));
+    r.appendChild(el('span', 'pr-sinal', sinal === '=' ? '' : (sinal === '-' ? '−' : sinal)));
     var c = el('div', 'pr-texto');
     r.appendChild(c);
     return { linha: r, texto: c };
@@ -142,7 +149,7 @@
         : '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>';
       c.appendChild(visto);
       var frase = el('span', 'pr-res-texto');
-      frase.appendChild(el('strong', '', a.e === 'aceite' ? 'Alteração aceite' : 'Original mantido'));
+      frase.appendChild(el('strong', '', ehSug(a) ? (a.e === 'aceite' ? 'Sugestão aplicada' : 'Mantido como estava') : (a.e === 'aceite' ? 'Alteração aceite' : 'Original mantido')));
       frase.appendChild(document.createTextNode(' · ' + descricaoItem(a)));
       c.appendChild(frase);
       var voltar = el('button', 'pr-desfazer', 'Desfazer');
@@ -152,11 +159,13 @@
       return c;
     }
 
+    var sug = ehSug(a);
+    if (sug) c.classList.add('pr-cartao-sug');
     var topo = el('div', 'pr-c-topo');
     topo.appendChild(el('span', 'pr-ia', 'IA'));
-    topo.appendChild(el('strong', '', 'Correção ' + a.n));
-    topo.appendChild(el('span', 'pr-c-tipo', rotuloTipo(a.k)));
-    var est = el('span', 'pr-c-estado', a.e === 'aceite' ? 'Aceite' : (a.e === 'rejeitada' ? 'Mantida como estava' : 'Por rever'));
+    topo.appendChild(el('strong', '', (sug ? 'Sugestão ' : 'Correção ') + a.n));
+    topo.appendChild(el('span', 'pr-c-tipo', sug ? 'Não está errado, mas ficaria melhor' : rotuloTipo(a.k)));
+    var est = el('span', 'pr-c-estado', sug ? 'Por decidir' : 'Por rever');
     topo.appendChild(est);
     c.appendChild(topo);
 
@@ -165,16 +174,16 @@
     motivo.appendChild(document.createTextNode(a.m || 'A forma foi ajustada à norma.'));
     corpo.appendChild(motivo);
 
-    var sug = el('div', 'pr-sugestao');
-    var s1 = el('div', 'pr-sug-linha pr-sug-del');
-    s1.appendChild(el('span', 'pr-sinal', '−'));
+    var caixa = el('div', 'pr-sugestao');
+    var s1 = el('div', 'pr-sug-linha ' + (sug ? 'pr-sug-atual' : 'pr-sug-del'));
+    s1.appendChild(el('span', 'pr-sinal', sug ? '~' : '−'));
     s1.appendChild(el('span', '', a.o !== '' ? a.o : '(nada)'));
     var s2 = el('div', 'pr-sug-linha pr-sug-ins');
     s2.appendChild(el('span', 'pr-sinal', '+'));
     s2.appendChild(el('span', '', a.c !== '' ? a.c : '(retirar)'));
-    sug.appendChild(s1);
-    sug.appendChild(s2);
-    corpo.appendChild(sug);
+    caixa.appendChild(s1);
+    caixa.appendChild(s2);
+    corpo.appendChild(caixa);
 
     var edicao = el('div', 'pr-edicao');
     edicao.hidden = true;
@@ -194,11 +203,11 @@
     corpo.appendChild(edicao);
 
     var botoes = el('div', 'rv-b-botoes');
-    var aceitar = el('button', 'btn btn-sm ' + (a.e === 'aceite' ? 'btn-sec' : 'btn-aprovar'), a.e === 'aceite' ? 'Aceite ✓' : 'Aceitar');
+    var aceitar = el('button', 'btn btn-sm ' + (a.e === 'aceite' ? 'btn-sec' : 'btn-aprovar'), a.e === 'aceite' ? 'Aceite ✓' : (sug ? 'Aplicar sugestão' : 'Aceitar'));
     aceitar.type = 'button';
     aceitar.disabled = a.e === 'aceite';
     aceitar.addEventListener('click', function () { decidir(a, 'aceite'); });
-    var manter = el('button', 'btn btn-sec btn-sm', a.e === 'rejeitada' ? 'Mantida ✓' : 'Manter o original');
+    var manter = el('button', 'btn btn-sec btn-sm', a.e === 'rejeitada' ? 'Mantida ✓' : (sug ? 'Manter como está' : 'Manter o original'));
     manter.type = 'button';
     manter.disabled = a.e === 'rejeitada';
     manter.addEventListener('click', function () { decidir(a, 'rejeitada'); });
@@ -235,12 +244,19 @@
   function criarGrupo(l) {
     var g = el('div', 'pr-grupo');
     g.setAttribute('data-linha', l.n);
-    var antes = criarLinha(l.n, '-', 'pr-l-del');
-    antes.texto.appendChild(textoLinha(l, 'antes'));
-    var depois = criarLinha(l.n, '+', 'pr-l-ins');
-    depois.texto.appendChild(textoLinha(l, 'depois'));
-    g.appendChild(antes.linha);
-    g.appendChild(depois.linha);
+    var soSugestoes = l.alts.every(function (a) { return ehSug(a) && a.e !== 'aceite'; });
+    if (soSugestoes) {
+      var unica = criarLinha(l.n, '~', 'pr-l-sug');
+      unica.texto.appendChild(textoLinha(l, 'antes'));
+      g.appendChild(unica.linha);
+    } else {
+      var antes = criarLinha(l.n, '-', 'pr-l-del');
+      antes.texto.appendChild(textoLinha(l, 'antes'));
+      var depois = criarLinha(l.n, '+', 'pr-l-ins');
+      depois.texto.appendChild(textoLinha(l, 'depois'));
+      g.appendChild(antes.linha);
+      g.appendChild(depois.linha);
+    }
     var fio = el('div', 'pr-fio');
     l.alts.forEach(function (a) {
       var c = criarCartao(a);
@@ -348,6 +364,7 @@
     b.appendChild(corpo);
     var est = el('span', 'rv-estado');
     est.setAttribute('data-estado', a.e);
+    if (ehSug(a)) est.setAttribute('data-sug', '1');
     b.appendChild(est);
     li.appendChild(b);
     itens[a.id] = li;
@@ -421,7 +438,7 @@
   function textoFinalDe(t) {
     var saida = '', cursor = 0;
     (t.alt || []).forEach(function (a) {
-      saida += t.texto.slice(cursor, a.pos) + (a.e === 'rejeitada' ? a.o : a.c);
+      saida += t.texto.slice(cursor, a.pos) + (aplica(a) ? a.c : a.o);
       cursor = a.pos + a.tam;
     });
     return saida + t.texto.slice(cursor);
@@ -429,9 +446,10 @@
   function prepararFinal() {
     $('pr-final').textContent = dados.trechos.map(textoFinalDe).join('\n\n');
     var c = contar();
-    $('pr-fim-resumo').textContent = c.pendente > 0
-      ? 'Ainda há ' + c.pendente + (c.pendente === 1 ? ' correção por rever; conta' : ' correções por rever; contam') + ' como aceites neste texto.'
-      : 'Todas as correções foram resolvidas. Este é o texto que vai para o ficheiro e para o áudio.';
+    var partes = [];
+    if (c.errosPend > 0) partes.push('Ainda há ' + c.errosPend + (c.errosPend === 1 ? ' correção por rever; conta' : ' correções por rever; contam') + ' como aceites neste texto.');
+    if (c.sugPend > 0) partes.push(c.sugPend + (c.sugPend === 1 ? ' sugestão por decidir não entra' : ' sugestões por decidir não entram') + ' no texto, a menos que as aplique.');
+    $('pr-fim-resumo').textContent = partes.length ? partes.join(' ') : 'Tudo resolvido. Este é o texto que vai para o ficheiro e para o áudio.';
   }
   $('pr-original').textContent = dados.trechos.map(function (t) { return t.texto; }).join('\n\n');
 
@@ -458,16 +476,16 @@
     if (todas.getAttribute('data-confirma') !== '1') {
       todas.setAttribute('data-confirma', '1');
       todas.textContent = 'Confirmar: aceitar todas';
-      setTimeout(function () { todas.removeAttribute('data-confirma'); todas.textContent = 'Aceitar todas'; }, 4000);
+      setTimeout(function () { todas.removeAttribute('data-confirma'); todas.textContent = 'Aceitar todas as correções'; }, 4000);
       return;
     }
     todas.removeAttribute('data-confirma');
     todas.disabled = true;
     todas.textContent = 'A aceitar…';
     chamar('alteracoes_aceitar', { id: tradId }).then(function (j) {
-      todas.textContent = 'Aceitar todas';
+      todas.textContent = 'Aceitar todas as correções';
       if (!j.ok) { todas.disabled = false; mostrarErro(j.erro); return; }
-      alts.forEach(function (a) { if (a.e === 'pendente') a.e = 'aceite'; atualizarItem(a); });
+      alts.forEach(function (a) { if (a.e === 'pendente' && !ehSug(a)) a.e = 'aceite'; atualizarItem(a); });
       construir();
       atualizarContagem();
       prepararFinal();

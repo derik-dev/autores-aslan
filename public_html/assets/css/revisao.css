@@ -159,3 +159,15 @@
 .pr-res-texto { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-2); }
 .pr-res-texto strong { color: var(--text); }
 @media (prefers-reduced-motion: reduce) { .pr-cartao.pr-resolvido { animation: none; } }
+
+/* Sugestões: não está errado, mas ficaria melhor (amarelo) */
+.pr-l-sug { background: #FBF5DF; }
+.pr-l-sug .pr-num, .pr-l-sug .pr-sinal { background: #F4E9BF; }
+.pr-sugm { background: #F2DE95; text-decoration: none; }
+.pr-cartao-sug { border-color: #E2C766; }
+.pr-cartao-sug .pr-c-topo { background: #FBF5DF; border-bottom-color: #EEDFA6; }
+.pr-cartao-sug .pr-c-tipo { color: #7A5F12; }
+.pr-sug-atual { background: #FBF5DF; }
+.pr-cartao[data-estado="aceite"] .pr-sug-atual { opacity: 0.5; }
+.pr-cartao-sug.pr-resolvido { border-color: var(--border); }
+.rv-estado[data-sug][data-estado="pendente"] { border-color: #C9A227; background: #F2DE95; }

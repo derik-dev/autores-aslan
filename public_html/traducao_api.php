@@ -304,6 +304,7 @@ try {
     }
 
     // ---------- Revisão de textos: decidir sobre uma correção ----------
+    // "Aceitar todas" só aceita correções de erros; as sugestões (tipo sugestao) ficam à escolha do autor.
     if ($acao === 'alteracao_estado') {
         $a      = alteracao_do_usuario((int) ($_POST['alteracao_id'] ?? 0), $usuario['id']);
         $estado = (string) ($_POST['estado'] ?? '');
@@ -334,7 +335,7 @@ try {
         if ($tipo !== '' && isset(REV_TIPOS[$tipo])) {
             $pdo->prepare("UPDATE revisao_alteracoes SET estado = 'aceite' WHERE traducao_id = ? AND estado = 'pendente' AND tipo = ?")->execute([$id, $tipo]);
         } else {
-            $pdo->prepare("UPDATE revisao_alteracoes SET estado = 'aceite' WHERE traducao_id = ? AND estado = 'pendente'")->execute([$id]);
+            $pdo->prepare("UPDATE revisao_alteracoes SET estado = 'aceite' WHERE traducao_id = ? AND estado = 'pendente' AND tipo <> 'sugestao'")->execute([$id]);
         }
         $o = $pdo->prepare('SELECT DISTINCT ordem FROM revisao_alteracoes WHERE traducao_id = ?');
         $o->execute([$id]);
