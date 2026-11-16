@@ -350,3 +350,6 @@ a { color: var(--brand); }
 .novo-link input[type="number"] { width: 70px; }
 .l-rotulo { display: inline-flex; align-items: center; gap: 6px; margin: 0; font-weight: 400; color: var(--text-2); }
 .l-resultado { margin: 0; overflow-wrap: anywhere; }
+
+.form label.marcar { display: flex; align-items: center; gap: 8px; font-weight: 400; margin-top: 8px; }
+.form label.marcar input { width: auto; }
