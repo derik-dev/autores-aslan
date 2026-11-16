@@ -749,3 +749,8 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--brand); }
 
 /* Início: três painéis por linha quando cabem */
 .indice-grade { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+
+/* Início em três colunas: nome em cima, descrição embaixo (a descrição não fica espremida) */
+.indice-grade .indice-item { grid-template-columns: 18px 1fr; align-items: start; row-gap: 2px; padding: 12px; }
+.indice-grade .indice-item .icone { margin-top: 2px; }
+.indice-grade .indice-desc { grid-column: 2; font-size: 13px; }
