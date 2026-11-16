@@ -5,25 +5,28 @@ require_once __DIR__ . '/../app/layout.php';
 
 $usuario = exigir_login();
 layout_inicio('Início', 'index', $usuario);
+
+$funcoes = [
+    ['audio.php',      'Texto em áudio', 'Converta textos, até um livro inteiro, em áudio.'],
+    ['traducao.php',   'Tradução',       'Traduza seu livro e revise lado a lado.'],
+    ['revisao.php',    'Revisão de textos', 'Corrija ortografia e gramática e confira trecho a trecho.'],
+    ['ebook.php',      'E-book',         'Transforme o texto em EPUB ou PDF.'],
+    ['inspiracao.php', 'Inspiração',     'Guarde ideias, personagens, pesquisas e imagens.'],
+    ['entregas.php',   'Entregas',       'Envie o livro por link seguro, com validade.'],
+    ['exemplares.php', 'Exemplares',     'Monte um grupo de leitores antes do lançamento.'],
+    ['vendas.php',     'Vendas',         'Acompanhe vendas e receitas dos seus livros.'],
+    ['analises.php',   'Análises',       'A IA lê seus números e aponta o que fazer.'],
+    ['mercado.php',    'Mercado',        'Ideias de palavras-chave, categorias e posicionamento.'],
+];
 ?>
         <p class="texto-2">Olá, <?= e($usuario['nome']) ?>. Escolha uma função para começar.</p>
 
         <div class="cards">
-            <a class="card" href="audio.php">
-                <h2>Texto em áudio</h2>
-                <p>Converta seus textos em áudio.</p>
+<?php foreach ($funcoes as [$link, $titulo, $texto]): ?>
+            <a class="card" href="<?= e($link) ?>">
+                <h2><?= e($titulo) ?></h2>
+                <p><?= e($texto) ?></p>
             </a>
-            <a class="card" href="traducao.php">
-                <h2>Tradução</h2>
-                <p>Traduza seu livro e revise lado a lado.</p>
-            </a>
-            <a class="card" href="vendas.php">
-                <h2>Vendas</h2>
-                <p>Acompanhe as vendas dos seus livros.</p>
-            </a>
-            <a class="card" href="revisao.php">
-                <h2>Revisão de textos</h2>
-                <p>Revise e corrija seus textos.</p>
-            </a>
+<?php endforeach; ?>
         </div>
 <?php layout_fim(); ?>

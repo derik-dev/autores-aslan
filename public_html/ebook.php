@@ -76,6 +76,13 @@ layout_inicio('E-book', 'ebook', $usuario);
                 var a = document.getElementById('arquivo');
                 var info = document.getElementById('nome-arquivo');
                 var titulo = document.getElementById('titulo');
+                // O e-book baixa sem trocar de página: devolve o botão ao normal depois do envio.
+                var form = document.getElementById('ebook-form');
+                var botao = form.querySelector('button[type="submit"]');
+                var rotulo = botao.textContent;
+                form.addEventListener('submit', function () {
+                    setTimeout(function () { botao.disabled = false; botao.textContent = rotulo; }, 6000);
+                });
                 a.addEventListener('change', function () {
                     if (!a.files[0]) { return; }
                     info.textContent = 'Arquivo escolhido: ' + a.files[0].name + '. O texto colado será ignorado.';

@@ -15,4 +15,8 @@ return [
 
     // Opcional: modelo da OpenAI usado na tradução (padrão: gpt-4.1).
     // 'openai_model' => 'gpt-4.1',
+
+    // Opcional: e-mails que também administram o sistema (importam vendas de todos os autores).
+    // O usuário de id 1 já é administrador.
+    // 'admin_emails' => ['voce@exemplo.com'],
 ];
