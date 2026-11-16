@@ -30,12 +30,17 @@ try {
         $obj = [
             'meta' => [
                 'foco' => $foco, 'foco_rotulo' => AN_FOCOS[$foco], 'meses' => $meses, 'periodo_rotulo' => AN_PERIODOS[$meses],
-                'escopo' => $escopo, 'autor_id' => $autorId, 'gerado_em' => date('d/m/Y H:i'),
+                'escopo' => $escopo, 'autor_id' => $autorId, 'gerado_em' => date('d/m/Y H:i'), 'assinatura' => an_assinatura($autorId, $meses),
             ],
             'fatos' => $r['fatos'],
             'ia' => $r['ia'],
         ];
         $id = rel_salvar($usuario['id'], 'analise2', AN_FOCOS[$foco] . ' · ' . AN_PERIODOS[$meses], json_encode($obj, JSON_UNESCAPED_UNICODE));
+        // "Atualizar relatório": o novo substitui o anterior, para a lista não encher de cópias.
+        $substituir = (int) ($_POST['substituir'] ?? 0);
+        if ($substituir > 0 && $substituir !== $id) {
+            db()->prepare("DELETE FROM relatorios WHERE id = ? AND usuario_id = ? AND tipo = 'analise2'")->execute([$substituir, $usuario['id']]);
+        }
         resp(['ok' => true, 'id' => $id, 'relatorio' => $obj]);
     }
 
@@ -44,7 +49,13 @@ try {
         if ($r === null) {
             falha('Relatório não encontrado.', 404);
         }
-        resp(['ok' => true, 'relatorio' => $r]);
+        // Compara os dados de hoje com os da época em que o relatório foi gerado.
+        $desatualizado = false;
+        if (!empty($r['meta']['assinatura'])) {
+            $autorRel = $editora ? (int) ($r['meta']['autor_id'] ?? 0) : (int) $usuario['id'];
+            $desatualizado = an_assinatura($autorRel, (int) ($r['meta']['meses'] ?? 0)) !== $r['meta']['assinatura'];
+        }
+        resp(['ok' => true, 'relatorio' => $r, 'desatualizado' => $desatualizado]);
     }
 
     if ($acao === 'excluir_relatorio') {

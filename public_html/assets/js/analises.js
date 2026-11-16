@@ -380,6 +380,8 @@
     function mesRot(m) { var p = String(m).split('-'); return p[1] + '/' + p[0]; }
     function proximoMes(m, k) { var p = m.split('-'); var d = new Date(parseInt(p[0], 10), parseInt(p[1], 10) - 1 + k, 1); return mesRot(d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0')); }
 
+    function dataBr(d) { var p = String(d).split('-'); return p[2] + '/' + p[1] + '/' + p[0]; }
+
     function el(tag, cls, texto) {
       var e = document.createElement(tag);
       if (cls) e.className = cls;
@@ -398,7 +400,7 @@
       return s;
     }
 
-    function renderRelatorio(r, id) {
+    function renderRelatorio(r, id, desatualizado) {
       var m = r.meta || {}, f = r.fatos || {}, ia = r.ia || {};
       var t = f.totais || {};
       view.innerHTML = '';
@@ -409,7 +411,7 @@
       var cab = el('header', 'an-rel-cabeca todas');
       var tit = el('div');
       tit.appendChild(el('h2', 'an-rel-titulo', ia.titulo || 'Análise de vendas'));
-      tit.appendChild(el('p', 'meta', (m.foco_rotulo || '') + ' · ' + (m.periodo_rotulo || '') + ' · ' + (m.escopo || '') + ' · gerado em ' + (m.gerado_em || '')));
+      tit.appendChild(el('p', 'meta', (m.foco_rotulo || '') + ' · ' + (m.periodo_rotulo || '') + ' · ' + (m.escopo || '') + ' · gerado em ' + (m.gerado_em || '') + (f.periodo && f.periodo.fim ? ' · vendas até ' + dataBr(f.periodo.fim) : '')));
       cab.appendChild(tit);
       var acoes = el('div', 'linha-acoes');
       var perguntar = el('button', 'btn btn-sec btn-sm', 'Falar com a LIA sobre este relatório');
@@ -437,11 +439,18 @@
           if (j.ok) window.location.href = 'analises.php?modo=relatorio';
         });
       });
+      var atualizar = el('button', 'btn btn-primary btn-sm', 'Atualizar relatório');
+      atualizar.type = 'button';
+      atualizar.addEventListener('click', function () { atualizarRelatorio(id, m); });
+      if (id) acoes.appendChild(atualizar);
       if (id) acoes.appendChild(perguntar);
       acoes.appendChild(imprimir);
       if (id) acoes.appendChild(apagar);
       cab.appendChild(acoes);
       grade.appendChild(cab);
+      if (desatualizado) {
+        grade.appendChild(el('p', 'alerta todas', 'Chegaram vendas novas desde que este relatório foi gerado. Clique em Atualizar relatório para ver os números mais recentes.'));
+      }
 
       // Resumo executivo
       var pRes = painel('Resumo executivo', 'todas');
@@ -619,7 +628,7 @@
       chamar('abrir_relatorio', { id: id }).then(function (j) {
         view.classList.remove('carregando');
         if (!j.ok) { erroRel.textContent = j.erro; erroRel.hidden = false; return; }
-        renderRelatorio(j.relatorio, id);
+        renderRelatorio(j.relatorio, id, j.desatualizado);
       });
     }
 
@@ -633,42 +642,117 @@
       });
     }
 
+    function registrarNaLista(id, relatorio, substituido) {
+      if (!lista) return;
+      var vazio = $('an-sem-relatorios');
+      if (vazio) vazio.remove();
+      if (substituido) {
+        var velho = lista.querySelector('li[data-id="' + substituido + '"]');
+        if (velho) velho.remove();
+      }
+      var li = document.createElement('li');
+      li.setAttribute('data-id', id);
+      var a = document.createElement('a');
+      a.href = '#';
+      a.setAttribute('data-abrir', id);
+      var s1 = document.createElement('span');
+      s1.textContent = relatorio.meta.foco_rotulo + ' · ' + relatorio.meta.periodo_rotulo;
+      var s2 = document.createElement('small');
+      s2.textContent = relatorio.meta.gerado_em;
+      a.appendChild(s1);
+      a.appendChild(s2);
+      li.appendChild(a);
+      lista.querySelectorAll('a').forEach(function (x) { x.classList.remove('ativo'); });
+      a.classList.add('ativo');
+      lista.insertBefore(li, lista.firstChild);
+    }
+
+    function mostrarCarregando(titulo, texto) {
+      view.innerHTML = '';
+      var p = el('section', 'bloco an-carregando');
+      p.setAttribute('aria-live', 'polite');
+      p.appendChild(el('h2', 'bloco-titulo', titulo));
+      p.appendChild(el('p', 'texto-2', texto));
+      var linhas = el('div', 'an-esqueleto');
+      for (var i = 0; i < 6; i++) linhas.appendChild(el('span'));
+      p.appendChild(linhas);
+      view.appendChild(p);
+    }
+
+    function mostrarErro(msg, tentar, voltarId) {
+      view.innerHTML = '';
+      var p = el('section', 'bloco');
+      p.appendChild(el('h2', 'bloco-titulo', 'Não consegui gerar o relatório'));
+      var e = el('p', 'alerta', msg);
+      e.setAttribute('role', 'alert');
+      p.appendChild(e);
+      var acoes = el('div', 'linha-acoes an-acoes-erro');
+      var b = el('button', 'btn btn-primary btn-sm', 'Tentar de novo');
+      b.type = 'button';
+      b.addEventListener('click', tentar);
+      acoes.appendChild(b);
+      if (voltarId) {
+        var v = el('button', 'btn btn-sec btn-sm', 'Voltar ao relatório anterior');
+        v.type = 'button';
+        v.addEventListener('click', function () { abrir(voltarId); });
+        acoes.appendChild(v);
+      }
+      p.appendChild(acoes);
+      view.appendChild(p);
+    }
+
+    var gerando = false;
+    function gerarRelatorio(params, titulo, texto, voltarId) {
+      if (gerando) return;
+      gerando = true;
+      erroRel.hidden = true;
+      if (gerar) { gerar.disabled = true; gerar.textContent = 'Gerando…'; }
+      mostrarCarregando(titulo, texto);
+      chamar('gerar_relatorio', params).then(function (j) {
+        gerando = false;
+        if (gerar) { gerar.disabled = false; gerar.textContent = 'Gerar outro relatório'; }
+        if (!j.ok) {
+          mostrarErro(j.erro, function () { gerarRelatorio(params, titulo, texto, voltarId); }, voltarId);
+          return;
+        }
+        renderRelatorio(j.relatorio, j.id, false);
+        registrarNaLista(j.id, j.relatorio, params.substituir);
+      });
+    }
+
+    // "Atualizar relatório": refaz o mesmo relatório com os dados de agora e substitui o anterior.
+    function atualizarRelatorio(id, meta) {
+      gerarRelatorio(
+        { foco: meta.foco || 'geral', meses: meta.meses || 0, autor: meta.autor_id || 0, substituir: id },
+        'Atualizando o relatório',
+        'O sistema recalcula os indicadores com os dados mais recentes e a LIA reescreve a análise. Leva de 20 a 60 segundos. Não feche esta aba.',
+        id
+      );
+    }
+
     if (gerar) {
       gerar.addEventListener('click', function () {
-        erroRel.hidden = true;
-        gerar.disabled = true;
-        gerar.textContent = 'Analisando…';
-        estado.textContent = 'O sistema está calculando os indicadores e a IA escrevendo a análise. Leva de 20 a 60 segundos. Não feche esta aba.';
         var autor = $('an-autor');
-        chamar('gerar_relatorio', { foco: $('an-foco').value, meses: $('an-periodo').value, autor: autor ? autor.value : 0 }).then(function (j) {
-          gerar.disabled = false;
-          gerar.textContent = 'Gerar relatório';
-          estado.textContent = '';
-          if (!j.ok) { erroRel.textContent = j.erro; erroRel.hidden = false; return; }
-          renderRelatorio(j.relatorio, j.id);
-          var vazio = $('an-sem-relatorios');
-          if (vazio) vazio.remove();
-          var li = document.createElement('li');
-          li.setAttribute('data-id', j.id);
-          var a = document.createElement('a');
-          a.href = '#';
-          a.setAttribute('data-abrir', j.id);
-          var s1 = document.createElement('span');
-          s1.textContent = j.relatorio.meta.foco_rotulo + ' · ' + j.relatorio.meta.periodo_rotulo;
-          var s2 = document.createElement('small');
-          s2.textContent = j.relatorio.meta.gerado_em;
-          a.appendChild(s1);
-          a.appendChild(s2);
-          li.appendChild(a);
-          lista.insertBefore(li, lista.firstChild);
-          a.classList.add('ativo');
-          if (window.innerWidth < 1100) view.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        });
+        gerarRelatorio(
+          { foco: $('an-foco').value, meses: $('an-periodo').value, autor: autor ? autor.value : 0 },
+          'Gerando o relatório',
+          'O sistema calcula os indicadores e a LIA escreve a análise. Leva de 20 a 60 segundos. Não feche esta aba.'
+        );
+        if (window.innerWidth < 1100) view.scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
     }
 
     var pedido = parseInt(app.getAttribute('data-relatorio') || '0', 10);
     var ultimo = parseInt(app.getAttribute('data-ultimo-relatorio') || '0', 10);
-    if (pedido > 0) abrir(pedido); else if (ultimo > 0) abrir(ultimo);
+    if (pedido > 0) abrir(pedido);
+    else if (ultimo > 0) abrir(ultimo);
+    else {
+      // Primeira visita: o relatório já começa a ser gerado, sem esperar um clique.
+      gerarRelatorio(
+        { foco: 'geral', meses: 0, autor: 0 },
+        'Preparando o seu relatório',
+        'É a sua primeira visita, então estou gerando o relatório de vendas: o sistema calcula os indicadores e a LIA escreve a análise. Leva de 20 a 60 segundos. Não feche esta aba.'
+      );
+    }
   }
 })();

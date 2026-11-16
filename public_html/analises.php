@@ -150,7 +150,8 @@ layout_inicio('Análises', 'analises', $usuario);
             <div class="an-grade an-grade-rel">
                 <aside class="an-lateral">
                     <section class="bloco">
-                        <h2 class="bloco-titulo">Novo relatório</h2>
+                        <h2 class="bloco-titulo">Outro relatório</h2>
+                        <p class="texto-2 an-ajuda">O relatório principal já aparece ao lado. Use este painel para ver outro foco, período ou autor.</p>
                         <div class="form">
                             <label for="an-foco">Foco da análise</label>
                             <select id="an-foco">
@@ -175,7 +176,7 @@ layout_inicio('Análises', 'analises', $usuario);
 <?php endif; ?>
                             <p class="alerta" role="alert" id="an-rel-erro" hidden></p>
                             <p class="texto-2" id="an-rel-estado" aria-live="polite"></p>
-                            <div><button type="button" class="btn btn-primary" id="an-gerar">Gerar relatório</button></div>
+                            <div><button type="button" class="btn btn-sec" id="an-gerar">Gerar outro relatório</button></div>
                         </div>
                     </section>
 
@@ -194,8 +195,8 @@ layout_inicio('Análises', 'analises', $usuario);
 
                 <div class="an-relatorio" id="an-relatorio-view">
                     <div class="vazio" id="an-rel-vazio">
-                        <strong>Nenhum relatório aberto</strong>
-                        Escolha o foco e o período e clique em Gerar relatório. Os indicadores são calculados com os seus números; a IA interpreta e recomenda.
+                        <strong>Carregando o relatório…</strong>
+                        Os indicadores são calculados com os seus números; a LIA interpreta e recomenda.
                     </div>
                 </div>
             </div>

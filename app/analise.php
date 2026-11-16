@@ -34,6 +34,16 @@ function an_condicao(int $autorId, int $meses): array
     return [implode(' AND ', $c), $p];
 }
 
+// Impressão digital dos dados de vendas de um escopo: muda quando entram, saem ou mudam vendas.
+function an_assinatura(int $autorId, int $meses): string
+{
+    [$onde, $par] = an_condicao($autorId, $meses);
+    $s = db()->prepare("SELECT COUNT(*) AS n, COALESCE(MAX(v.id), 0) AS m, COALESCE(SUM(v.receita_autor), 0) AS r, COALESCE(SUM(v.quantidade), 0) AS q FROM vendas v WHERE $onde");
+    $s->execute($par);
+    $r = $s->fetch();
+    return md5(implode('|', [$r['n'], $r['m'], $r['r'], $r['q']]));
+}
+
 function an_num($valor, int $casas = 2): float
 {
     return round((float) $valor, $casas);

@@ -702,3 +702,16 @@ details.importar { margin-top: 16px; padding: 14px 20px; }
 .trad-bloco { border-left-color: var(--bege-detalhe); }
 .trad-bloco.aprovado { border-left-color: var(--success); }
 .an-abas .ia { color: var(--brand); }
+
+/* ---------- Relatório automático: carregando e avisos ---------- */
+.an-rel > .alerta { margin: 0; }
+.an-ajuda { margin: 0 0 12px; font-size: 13px; }
+.an-carregando { max-width: 760px; }
+.an-esqueleto { display: grid; gap: 12px; margin-top: 22px; }
+.an-esqueleto span { display: block; height: 14px; border-radius: 4px; background: var(--hover); animation: an-pulso 1.4s ease-in-out infinite; }
+.an-esqueleto span:nth-child(odd) { width: 94%; }
+.an-esqueleto span:nth-child(even) { width: 78%; animation-delay: .2s; }
+.an-esqueleto span:last-child { width: 52%; }
+@keyframes an-pulso { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+.an-acoes-erro { margin-top: 16px; }
+@media (prefers-reduced-motion: reduce) { .an-esqueleto span { animation: none; } }
