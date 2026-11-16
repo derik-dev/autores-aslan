@@ -118,3 +118,9 @@
 @media print {
   .pr-cabeca, .rv-lateral, .pr-fio { display: none !important; }
 }
+
+/* Tela de envio: bloco centrado e campo de texto grande */
+#trad-app.rv-envio { display: block; width: 100%; max-width: 920px; margin-left: auto; margin-right: auto; }
+.rv-envio .rv-campo-texto { min-height: clamp(380px, 62vh, 720px); font-size: 16px; line-height: 1.7; padding: 16px 18px; resize: vertical; }
+.rv-envio #titulo { font-size: 16px; padding: 12px 14px; }
+@media (max-width: 640px) { .rv-envio .rv-campo-texto { min-height: 320px; padding: 12px; } }

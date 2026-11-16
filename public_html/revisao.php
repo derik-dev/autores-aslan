@@ -37,6 +37,8 @@ $rotulosStatus = ['concluido' => 'Revisto', 'erro' => 'Erro', 'processando' => '
 $classesStatus = ['concluido' => 'chip-ok', 'erro' => 'chip-erro', 'processando' => 'chip-neutro', 'pendente' => 'chip-neutro'];
 
 layout_inicio('Revisão de textos', 'revisao', $usuario);
+echo '<link rel="stylesheet" href="' . asset_url('assets/css/revisao.css') . '">' . "
+";
 ?>
         <p class="texto-2">Cole ou carregue um texto. A IA corrige a ortografia, a acentuação, a gramática e a pontuação sem mudar o seu estilo, e mostra cada correção marcada no texto, com a explicação.</p>
 
@@ -44,7 +46,7 @@ layout_inicio('Revisão de textos', 'revisao', $usuario);
         <p class="alerta" role="alert">Faltam tabelas na base de dados. Importe o ficheiro <strong>database/schema.sql</strong> no phpMyAdmin e recarregue esta página.</p>
 <?php endif; ?>
 <?php if ($tabelasOk): ?>
-        <div id="trad-app" data-modo="rev" data-csrf="<?= e(csrf_token()) ?>">
+        <div id="trad-app" class="rv-envio" data-modo="rev" data-csrf="<?= e(csrf_token()) ?>">
 
             <section class="bloco">
                 <h2 class="bloco-titulo">Novo texto para rever</h2>
@@ -57,7 +59,7 @@ layout_inicio('Revisão de textos', 'revisao', $usuario);
                         <label for="arquivo" class="btn btn-sec btn-sm" id="rotulo-arquivo">Carregar ficheiro (.txt ou .docx)</label>
                         <input type="file" id="arquivo" accept=".txt,.docx" hidden>
                     </div>
-                    <textarea id="texto" rows="10" placeholder="Cole aqui o texto que quer rever…"></textarea>
+                    <textarea id="texto" class="rv-campo-texto" rows="18" placeholder="Cole aqui o texto que quer rever…"></textarea>
                     <p id="resumo" class="texto-2">Ainda não há texto.</p>
 
                     <p id="erro-form" class="alerta" role="alert" hidden></p>
