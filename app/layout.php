@@ -19,6 +19,14 @@ const MENU = [
     'autores'   => ['Autores',           'autores.php',    'pessoas'],
 ];
 
+// Como o menu lateral e o início agrupam as funções.
+const MENU_GRUPOS = [
+    'Criar'    => ['audio', 'traducao', 'revisao', 'ebook', 'inspiracao'],
+    'Publicar' => ['entregas', 'exemplares'],
+    'Negócio'  => ['vendas', 'analises', 'mercado'],
+    'Editora'  => ['autores'],
+];
+
 // Ícones Lucide (linha fina), inline para não depender de serviço externo.
 const ICONES = [
     'casa'    => '<path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',
@@ -56,14 +64,19 @@ function layout_inicio(string $titulo, string $ativo, array $usuario): void
     <button class="menu-toggle" type="button" aria-label="Abrir menu" data-menu-toggle>Menu</button>
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-brand">Autores</div>
-        <nav class="sidebar-nav">
-            <?php foreach (MENU as $chave => [$rotulo, $link, $ico]): ?>
-                <?php if ($chave === 'autores' && !eh_editora($usuario)) { continue; } ?>
-                <a href="<?= e($link) ?>" class="<?= $chave === $ativo ? 'ativo' : '' ?>"><?= icone($ico) ?><span><?= e($rotulo) ?></span></a>
+        <nav class="sidebar-nav" aria-label="Principal">
+            <?php [$rotulo, $link, $ico] = MENU['index']; ?>
+            <a href="<?= e($link) ?>" class="<?= $ativo === 'index' ? 'ativo' : '' ?>"<?= $ativo === 'index' ? ' aria-current="page"' : '' ?>><?= icone($ico) ?><span><?= e($rotulo) ?></span></a>
+            <?php foreach (MENU_GRUPOS as $grupo => $chaves): ?>
+                <?php if (in_array('autores', $chaves, true) && !eh_editora($usuario)) { continue; } ?>
+                <div class="nav-grupo"><?= e($grupo) ?></div>
+                <?php foreach ($chaves as $chave): [$rotulo, $link, $ico] = MENU[$chave]; ?>
+                    <a href="<?= e($link) ?>" class="<?= $chave === $ativo ? 'ativo' : '' ?>"<?= $chave === $ativo ? ' aria-current="page"' : '' ?>><?= icone($ico) ?><span><?= e($rotulo) ?></span></a>
+                <?php endforeach; ?>
             <?php endforeach; ?>
         </nav>
         <div class="sidebar-user">
-            <span><?= e($usuario['nome']) ?></span>
+            <span class="usuario-nome"><?= e($usuario['nome']) ?></span>
             <form method="post" action="logout.php">
                 <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
                 <button type="submit" class="link-sair"><?= icone('sair') ?>Sair</button>

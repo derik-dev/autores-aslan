@@ -101,10 +101,10 @@ layout_inicio('Vendas', 'vendas', $usuario);
                 <?= $editora ? 'Importe um relatório de vendas acima para ver os números.' : 'Quando a editora importar o relatório de vendas, os seus números aparecem aqui.' ?>
             </div>
 <?php else: ?>
-            <div class="cards">
-                <div class="card"><h2><?= num_br($tot['q']) ?></h2><p>exemplares vendidos</p></div>
-                <div class="card"><h2><?= e(brl($tot['b'])) ?></h2><p>vendas brutas</p></div>
-                <div class="card"><h2><?= e(brl($tot['r'])) ?></h2><p>receita do autor</p></div>
+            <div class="numeros">
+                <div><strong><?= num_br($tot['q']) ?></strong><span>exemplares vendidos</span></div>
+                <div><strong><?= e(brl($tot['b'])) ?></strong><span>vendas brutas</span></div>
+                <div><strong><?= e(brl($tot['r'])) ?></strong><span>receita do autor</span></div>
             </div>
 
             <section class="bloco">
