@@ -153,16 +153,14 @@ layout_inicio('Análises', 'analises', $usuario);
                         </div>
                     </section>
 
-<?php if ($conversas): ?>
-                    <section class="bloco">
+                    <section class="bloco" id="an-painel-conversas"<?= $conversas ? '' : ' hidden' ?>>
                         <h2 class="bloco-titulo">Conversas anteriores</h2>
-                        <ul class="an-lista">
+                        <ul class="an-lista" id="an-lista-conversas">
 <?php foreach ($conversas as $c): ?>
-                            <li><a href="analises.php?modo=conversa&amp;c=<?= (int) $c['id'] ?>" class="<?= ($conversa && (int) $conversa['id'] === (int) $c['id']) ? 'ativo' : '' ?>"><span><?= e($c['titulo']) ?></span><small><?= e(date('d/m/Y', strtotime($c['atualizado_em']))) ?></small></a></li>
+                            <li data-id="<?= (int) $c['id'] ?>"><a href="analises.php?modo=conversa&amp;c=<?= (int) $c['id'] ?>" class="<?= ($conversa && (int) $conversa['id'] === (int) $c['id']) ? 'ativo' : '' ?>"><span><?= e($c['titulo']) ?></span><small><?= e(date('d/m/Y', strtotime($c['atualizado_em']))) ?></small></a></li>
 <?php endforeach; ?>
                         </ul>
                     </section>
-<?php endif; ?>
                 </aside>
             </div>
 

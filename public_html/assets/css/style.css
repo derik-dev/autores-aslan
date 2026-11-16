@@ -662,3 +662,18 @@ details.importar { margin-top: 16px; padding: 14px 20px; }
   .an-grade-rel { grid-template-columns: 1fr; }
   body { background: #fff; }
 }
+
+/* ---------- Conversa: entradas suaves e cursor de escrita ---------- */
+.an-msg-nova { animation: an-entrar .32s cubic-bezier(0.22, 1, 0.36, 1) both; }
+@keyframes an-entrar { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+.an-digitando { animation: an-aparecer .25s ease both; }
+@keyframes an-aparecer { from { opacity: 0; } to { opacity: 1; } }
+.an-cursor { display: inline-block; width: 2px; height: 1.05em; margin-left: 2px; vertical-align: text-bottom; background: var(--brand); animation: an-piscar 1s steps(1) infinite; }
+@keyframes an-piscar { 50% { opacity: 0; } }
+#an-chat-titulo { transition: opacity .17s ease; }
+#an-chat-titulo.an-sumindo { opacity: 0; }
+.an-lista li { transition: background-color .2s; }
+@media (prefers-reduced-motion: reduce) {
+  .an-msg-nova, .an-digitando { animation: none; }
+  .an-cursor { animation: none; }
+}

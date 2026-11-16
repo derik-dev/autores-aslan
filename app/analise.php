@@ -434,6 +434,19 @@ function an_chat_sistema(array $fatos, string $escopo, string $tabela, ?array $r
     return $s;
 }
 
+// Título curto da conversa, criado pela IA a partir da primeira pergunta (e do começo da resposta).
+function an_titulo(string $pergunta, string $resposta): string
+{
+    $sistema = "Você cria títulos curtos para conversas sobre vendas de livros. "
+        . "Responda SOMENTE com o título: de 3 a 6 palavras, em português do Brasil, sem aspas e sem ponto final. "
+        . "O título deve ser específico ao assunto perguntado (nunca genérico como \"Conversa\" ou \"Análise de vendas\"). "
+        . "Se a mensagem for só uma saudação, use \"Conversa inicial\".";
+    $usuario = "Pergunta:\n" . mb_substr($pergunta, 0, 500, 'UTF-8') . "\n\nInício da resposta:\n" . mb_substr($resposta, 0, 400, 'UTF-8');
+    $t = oa_mensagem($sistema, $usuario, 60, 30, 0.3);
+    $t = trim((string) preg_replace('/\s+/u', ' ', $t), " \t\n\r\0\x0B\"'«».");
+    return mb_substr($t, 0, 80, 'UTF-8');
+}
+
 // Responde à última mensagem da conversa. $historico = [['role' => 'user'|'assistant', 'content' => ...], ...]
 function an_chat_responder(array $fatos, string $escopo, string $tabela, ?array $relatorio, array $historico): string
 {

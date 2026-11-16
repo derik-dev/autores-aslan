@@ -108,6 +108,97 @@ function oa_chat(array $mensagens, int $maxTokens = 8000, int $timeout = 150, ?f
     return $texto;
 }
 
+// Igual ao oa_chat, mas recebe a resposta aos poucos: $aoTexto é chamada a cada trecho de texto que chega.
+// Devolve o texto completo. Lança exceção em erro (mesmo no meio da resposta).
+function oa_chat_stream(array $mensagens, callable $aoTexto, int $maxTokens = 2200, int $timeout = 120, ?float $temperatura = null): string
+{
+    $dados = [
+        'model'                 => oa_modelo(),
+        'max_completion_tokens' => $maxTokens,
+        'messages'              => $mensagens,
+        'stream'                => true,
+    ];
+    if ($temperatura !== null && !preg_match('/^(o\d|gpt-5)/i', $dados['model'])) {
+        $dados['temperature'] = $temperatura;
+    }
+
+    $status = 0;
+    $linhaParcial = '';
+    $completo = '';
+    $corpoErro = '';
+    $motivoFim = '';
+
+    $ch = curl_init(OA_URL);
+    curl_setopt_array($ch, [
+        CURLOPT_POST           => true,
+        CURLOPT_POSTFIELDS     => json_encode($dados, JSON_UNESCAPED_UNICODE),
+        CURLOPT_TIMEOUT        => $timeout,
+        CURLOPT_CONNECTTIMEOUT => 15,
+        CURLOPT_HTTPHEADER     => [
+            'Authorization: Bearer ' . oa_chave(),
+            'Content-Type: application/json',
+            'Accept: text/event-stream',
+        ],
+        CURLOPT_HEADERFUNCTION => function ($c, $linha) use (&$status) {
+            if (preg_match('#^HTTP/\S+\s+(\d{3})#', $linha, $m)) {
+                $status = (int) $m[1];
+            }
+            return strlen($linha);
+        },
+        CURLOPT_WRITEFUNCTION  => function ($c, $dado) use (&$status, &$linhaParcial, &$completo, &$corpoErro, &$motivoFim, $aoTexto) {
+            if ($status !== 200) {
+                $corpoErro .= $dado;
+                return strlen($dado);
+            }
+            $linhaParcial .= $dado;
+            while (($pos = strpos($linhaParcial, "\n")) !== false) {
+                $linha        = trim(substr($linhaParcial, 0, $pos));
+                $linhaParcial = substr($linhaParcial, $pos + 1);
+                if ($linha === '' || strpos($linha, 'data:') !== 0) {
+                    continue;
+                }
+                $carga = trim(substr($linha, 5));
+                if ($carga === '[DONE]') {
+                    continue;
+                }
+                $j = json_decode($carga, true);
+                if (!is_array($j)) {
+                    continue;
+                }
+                $trecho = (string) ($j['choices'][0]['delta']['content'] ?? '');
+                $fim    = $j['choices'][0]['finish_reason'] ?? null;
+                if ($fim) {
+                    $motivoFim = (string) $fim;
+                }
+                if ($trecho !== '') {
+                    $completo .= $trecho;
+                    $aoTexto($trecho);
+                }
+            }
+            return strlen($dado);
+        },
+    ]);
+    $ok = curl_exec($ch);
+    if ($ok === false) {
+        $motivo = curl_error($ch);
+        curl_close($ch);
+        throw new RuntimeException('Não consegui falar com a OpenAI (' . $motivo . '). Tente de novo em instantes.');
+    }
+    $codigo = (int) curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+    curl_close($ch);
+
+    if ($codigo !== 200) {
+        throw new RuntimeException(oa_mensagem_erro($codigo, $corpoErro));
+    }
+    if ($motivoFim === 'length') {
+        throw new RuntimeException('A resposta ficou grande demais e foi cortada. Tente uma pergunta mais específica.');
+    }
+    if (trim($completo) === '') {
+        throw new RuntimeException('A OpenAI devolveu uma resposta vazia. Tente de novo.');
+    }
+    return trim($completo);
+}
+
 // Atalho: uma instrução de sistema e uma mensagem do usuário.
 function oa_mensagem(string $sistema, string $usuario, int $maxTokens = 8000, int $timeout = 150, ?float $temperatura = null): string
 {

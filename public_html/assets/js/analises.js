@@ -92,16 +92,20 @@
   if (thread) {
     var form = $('an-form'), caixa = $('an-pergunta'), enviar = $('an-enviar'), erroChat = $('an-chat-erro');
     var ocupado = false;
+    var grudado = true; // acompanha o fim da conversa enquanto o usuário não rolar para cima
 
     document.querySelectorAll('[data-md]').forEach(function (el) { el.innerHTML = md(el.textContent); });
-    function rolar() { thread.scrollTop = thread.scrollHeight; }
-    rolar();
+    thread.scrollTop = thread.scrollHeight;
+    thread.addEventListener('scroll', function () {
+      grudado = thread.scrollHeight - thread.scrollTop - thread.clientHeight < 80;
+    });
+    function descer() { if (grudado) thread.scrollTop = thread.scrollHeight; }
 
     function mensagem(papel, html, ehHtml) {
       var vazio = $('an-vazio');
       if (vazio) vazio.remove();
       var m = document.createElement('div');
-      m.className = 'an-msg ' + (papel === 'user' ? 'an-msg-user' : 'an-msg-ia');
+      m.className = 'an-msg an-msg-nova ' + (papel === 'user' ? 'an-msg-user' : 'an-msg-ia');
       var p = document.createElement('div');
       p.className = 'an-msg-papel';
       p.textContent = papel === 'user' ? 'Você' : 'Analista';
@@ -111,7 +115,8 @@
       m.appendChild(p);
       m.appendChild(t);
       thread.appendChild(m);
-      rolar();
+      grudado = true;
+      descer();
       return m;
     }
 
@@ -120,6 +125,144 @@
       caixa.style.height = Math.min(caixa.scrollHeight + 2, 160) + 'px';
     }
 
+    // ---------- Efeito de escrita: o texto que chega vai aparecendo aos poucos, num ritmo natural ----------
+    // Fecha marcas abertas e segura linhas de tabela incompletas, para o texto não "pular" enquanto aparece.
+    function paraExibir(t) {
+      var linhas = t.split('\n');
+      var ult = linhas[linhas.length - 1];
+      if (/^\s*\|/.test(ult) && !/\|\s*$/.test(ult)) linhas.pop();
+      var n = linhas.length;
+      if (n && /^\s*\|.*\|\s*$/.test(linhas[n - 1]) && !(n > 1 && /^\s*\|/.test(linhas[n - 2]))) linhas.pop();
+      var s = linhas.join('\n');
+      if (((s.match(/\*\*/g) || []).length) % 2 === 1) s += '**';
+      return s;
+    }
+
+    function Escritor(alvo) {
+      this.alvo = alvo;
+      this.fila = '';
+      this.mostrado = 0;
+      this.acum = 0;
+      this.fim = false;
+      this.rodando = false;
+      this.ultimo = 0;
+      this.ultimoRender = 0;
+      this.aoFim = null;
+    }
+    Escritor.prototype.add = function (t) { this.fila += t; this.iniciar(); };
+    Escritor.prototype.terminar = function (cb) { this.fim = true; this.aoFim = cb; this.iniciar(); };
+    Escritor.prototype.iniciar = function () {
+      if (this.rodando) return;
+      this.rodando = true;
+      this.ultimo = performance.now();
+      var self = this;
+      requestAnimationFrame(function passo(agora) { self.passo(agora, passo); });
+    };
+    Escritor.prototype.passo = function (agora, proximo) {
+      var dt = Math.min(0.1, (agora - this.ultimo) / 1000);
+      this.ultimo = agora;
+      var faltam = this.fila.length - this.mostrado;
+      if (faltam > 0) {
+        // Ritmo base de escrita; acelera quando há muito texto acumulado, para não ficar atrasado.
+        var cps = Math.min(900, 60 + faltam * 2.4);
+        this.acum += cps * dt;
+        var n = Math.floor(this.acum);
+        if (n > 0) {
+          this.acum -= n;
+          this.mostrado = Math.min(this.fila.length, this.mostrado + n);
+          if (agora - this.ultimoRender > 32) this.renderizar(false, agora);
+        }
+        requestAnimationFrame(proximo);
+        return;
+      }
+      if (this.fim) {
+        this.renderizar(true, agora);
+        this.rodando = false;
+        if (this.aoFim) this.aoFim();
+        return;
+      }
+      this.rodando = false; // sem nada novo por ora: espera o próximo trecho
+    };
+    Escritor.prototype.renderizar = function (final, agora) {
+      this.ultimoRender = agora;
+      var texto = this.fila.slice(0, this.mostrado);
+      this.alvo.innerHTML = md(final ? this.fila : paraExibir(texto));
+      if (!final) {
+        var ult = this.alvo.lastElementChild;
+        if (ult && (ult.tagName === 'UL' || ult.tagName === 'OL') && ult.lastElementChild) ult = ult.lastElementChild;
+        if (ult && ult.tagName !== 'DIV') {
+          var c = document.createElement('span');
+          c.className = 'an-cursor';
+          ult.appendChild(c);
+        }
+      }
+      descer();
+    };
+
+    // ---------- Leitura do fluxo de eventos do servidor ----------
+    function lerEventos(res, aoEvento) {
+      function processar(bloco) {
+        bloco.split('\n').forEach(function (l) {
+          if (l.indexOf('data:') === 0) {
+            var d = null;
+            try { d = JSON.parse(l.slice(5).trim()); } catch (e) { d = null; }
+            if (d) aoEvento(d);
+          }
+        });
+      }
+      if (!res.body || !res.body.getReader) {
+        return res.text().then(function (t) { t.split('\n\n').forEach(processar); });
+      }
+      var leitor = res.body.getReader();
+      var dec = new TextDecoder('utf-8');
+      var buf = '';
+      function passo() {
+        return leitor.read().then(function (r) {
+          if (r.done) { processar(buf); return; }
+          buf += dec.decode(r.value, { stream: true });
+          var partes = buf.split('\n\n');
+          buf = partes.pop();
+          partes.forEach(processar);
+          return passo();
+        });
+      }
+      return passo();
+    }
+
+    // ---------- Título e lista de conversas ----------
+    function atualizarTitulo(titulo) {
+      var t = $('an-chat-titulo');
+      if (!t || !titulo) return;
+      t.classList.add('an-sumindo');
+      setTimeout(function () { t.textContent = titulo; t.classList.remove('an-sumindo'); }, 170);
+    }
+    function atualizarLista(id, titulo) {
+      var painel = $('an-painel-conversas'), lista = $('an-lista-conversas');
+      if (!painel || !lista || !id) return;
+      painel.hidden = false;
+      lista.querySelectorAll('a').forEach(function (a) { a.classList.remove('ativo'); });
+      var li = lista.querySelector('li[data-id="' + id + '"]');
+      var novo = !li;
+      if (!li) {
+        li = document.createElement('li');
+        li.setAttribute('data-id', id);
+        li.className = 'an-msg-nova';
+        var a = document.createElement('a');
+        a.href = 'analises.php?modo=conversa&c=' + id;
+        a.appendChild(document.createElement('span'));
+        var s = document.createElement('small');
+        var hoje = new Date();
+        s.textContent = String(hoje.getDate()).padStart(2, '0') + '/' + String(hoje.getMonth() + 1).padStart(2, '0') + '/' + hoje.getFullYear();
+        a.appendChild(s);
+        li.appendChild(a);
+      }
+      var link = li.querySelector('a');
+      link.classList.add('ativo');
+      if (titulo) link.querySelector('span').textContent = titulo;
+      if (novo || lista.firstChild !== li) lista.insertBefore(li, lista.firstChild);
+    }
+
+    // ---------- Enviar uma pergunta ----------
     function perguntar(texto) {
       texto = texto.trim();
       if (!texto || ocupado) return;
@@ -129,33 +272,71 @@
       enviar.textContent = 'Analisando…';
       var minha = mensagem('user', texto, false);
       var resposta = mensagem('ia', '<span class="an-digitando">Analisando os números<i></i><i></i><i></i></span>', true);
+      var alvo = resposta.querySelector('.an-msg-texto');
       caixa.value = '';
       ajustarCaixa();
 
-      var autor = $('an-autor');
-      chamar('chat_enviar', { conversa_id: conversaId, mensagem: texto, autor: autor ? autor.value : 0 }).then(function (j) {
+      var escritor = null;
+      var recebeuFim = false;
+      var falhou = false;
+
+      function liberar() {
         ocupado = false;
         enviar.disabled = false;
         enviar.textContent = 'Enviar pergunta';
-        if (!j.ok) {
-          minha.remove();
-          resposta.remove();
-          caixa.value = texto;
-          ajustarCaixa();
-          erroChat.textContent = j.erro;
-          erroChat.hidden = false;
-          return;
-        }
-        resposta.querySelector('.an-msg-texto').innerHTML = md(j.resposta);
-        if (!conversaId) {
-          conversaId = j.conversa_id;
-          if (autor) autor.disabled = true;
-          try { history.replaceState(null, '', 'analises.php?modo=conversa&c=' + conversaId); } catch (e) {}
-        }
-        var titulo = $('an-chat-titulo');
-        if (titulo && j.titulo) titulo.textContent = j.titulo;
-        rolar();
         caixa.focus();
+      }
+      function falhar(msg) {
+        if (falhou) return;
+        falhou = true;
+        minha.remove();
+        resposta.remove();
+        caixa.value = texto;
+        ajustarCaixa();
+        erroChat.textContent = msg;
+        erroChat.hidden = false;
+        liberar();
+      }
+      function aoEvento(ev) {
+        if (falhou) return;
+        if (ev.tipo === 'inicio') {
+          if (!conversaId) {
+            conversaId = ev.conversa_id;
+            var sel = $('an-autor');
+            if (sel) sel.disabled = true;
+            try { history.replaceState(null, '', 'analises.php?modo=conversa&c=' + conversaId); } catch (e) {}
+            atualizarLista(conversaId, texto.length > 40 ? texto.slice(0, 40) + '…' : texto);
+          }
+        } else if (ev.tipo === 'texto') {
+          if (!escritor) { alvo.innerHTML = ''; escritor = new Escritor(alvo); }
+          escritor.add(ev.t);
+        } else if (ev.tipo === 'fim') {
+          recebeuFim = true;
+          if (escritor) escritor.terminar(liberar); else liberar();
+        } else if (ev.tipo === 'titulo') {
+          atualizarTitulo(ev.titulo);
+          atualizarLista(ev.conversa_id || conversaId, ev.titulo);
+        } else if (ev.tipo === 'erro') {
+          falhar(ev.erro || 'Não consegui responder agora. Tente de novo.');
+        }
+      }
+
+      fetch('analises_stream.php', {
+        method: 'POST', credentials: 'same-origin', headers: { 'X-CSRF': csrf },
+        body: new URLSearchParams({ conversa_id: conversaId, mensagem: texto, autor: ($('an-autor') ? $('an-autor').value : 0) })
+      }).then(function (res) {
+        var tipo = res.headers.get('content-type') || '';
+        if (tipo.indexOf('application/json') !== -1) {
+          return res.json().then(function (j) { falhar(j.erro || 'Não consegui responder agora. Tente de novo.'); });
+        }
+        return lerEventos(res, aoEvento);
+      }).catch(function () {
+        falhar('Sem conexão com o servidor. Verifique a internet e tente de novo.');
+      }).then(function () {
+        // O fluxo acabou sem o evento "fim": termina com o que chegou, ou avisa o erro.
+        if (!falhou && !recebeuFim) {
+          if (escritor) escritor.terminar(liberar); else falhar('A resposta foi interrompida. Tente de novo.');
+        }
       });
     }
 
