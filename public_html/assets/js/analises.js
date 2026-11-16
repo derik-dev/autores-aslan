@@ -108,7 +108,7 @@
       m.className = 'an-msg an-msg-nova ' + (papel === 'user' ? 'an-msg-user' : 'an-msg-ia');
       var p = document.createElement('div');
       p.className = 'an-msg-papel';
-      p.textContent = papel === 'user' ? 'Você' : 'Lia';
+      p.textContent = papel === 'user' ? 'Você' : 'LIA';
       var t = document.createElement('div');
       t.className = 'an-msg-texto';
       if (ehHtml) t.innerHTML = html; else t.textContent = html;
@@ -412,7 +412,7 @@
       tit.appendChild(el('p', 'meta', (m.foco_rotulo || '') + ' · ' + (m.periodo_rotulo || '') + ' · ' + (m.escopo || '') + ' · gerado em ' + (m.gerado_em || '')));
       cab.appendChild(tit);
       var acoes = el('div', 'linha-acoes');
-      var perguntar = el('button', 'btn btn-sec btn-sm', 'Perguntar sobre este relatório');
+      var perguntar = el('button', 'btn btn-sec btn-sm', 'Falar com a LIA sobre este relatório');
       perguntar.type = 'button';
       perguntar.addEventListener('click', function () {
         perguntar.disabled = true;

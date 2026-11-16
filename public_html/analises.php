@@ -7,7 +7,7 @@ require_once __DIR__ . '/../app/analise.php';
 
 $usuario = exigir_login();
 $editora = eh_editora($usuario);
-$modo    = (($_GET['modo'] ?? 'conversa') === 'relatorio') ? 'relatorio' : 'conversa';
+$modo    = (($_GET['modo'] ?? 'relatorio') === 'conversa') ? 'conversa' : 'relatorio';
 
 $tabelasOk  = true;
 $resumo     = ['n' => 0, 'livros' => 0, 'canais' => 0, 'inicio' => null, 'fim' => null];
@@ -58,7 +58,7 @@ $mes = function (?string $d): string {
 
 layout_inicio('Análises', 'analises', $usuario);
 ?>
-        <p class="texto-2">Entenda as suas vendas conversando com um analista ou gerando um relatório. Os números são calculados pelo sistema; a IA interpreta e recomenda.</p>
+        <p class="texto-2">Veja o relatório das suas vendas ou fale com a LIA, a inteligência artificial que lê os seus números. Os cálculos são feitos pelo sistema; a IA interpreta e recomenda.</p>
 
 <?php if (!$tabelasOk): ?>
         <p class="alerta" role="alert">As tabelas ainda não existem no banco. Importe o arquivo <strong>database/schema.sql</strong> no phpMyAdmin e recarregue esta página.</p>
@@ -66,8 +66,8 @@ layout_inicio('Análises', 'analises', $usuario);
         <div id="an-app" data-csrf="<?= e(csrf_token()) ?>" data-modo="<?= e($modo) ?>" data-editora="<?= $editora ? '1' : '0' ?>" data-conversa="<?= $conversa ? (int) $conversa['id'] : 0 ?>" data-ultimo-relatorio="<?= $relatorios ? (int) $relatorios[0]['id'] : 0 ?>" data-relatorio="<?= (int) ($_GET['r'] ?? 0) ?>">
 
             <nav class="an-abas" aria-label="Modo">
-                <a href="analises.php?modo=conversa" class="<?= $modo === 'conversa' ? 'ativo' : '' ?>"<?= $modo === 'conversa' ? ' aria-current="page"' : '' ?>>Conversa</a>
                 <a href="analises.php?modo=relatorio" class="<?= $modo === 'relatorio' ? 'ativo' : '' ?>"<?= $modo === 'relatorio' ? ' aria-current="page"' : '' ?>>Relatório</a>
+                <a href="analises.php?modo=conversa" class="<?= $modo === 'conversa' ? 'ativo' : '' ?>"<?= $modo === 'conversa' ? ' aria-current="page"' : '' ?>>Falar com a L<span class="ia">IA</span></a>
             </nav>
 
 <?php if (!$temVendas): ?>
@@ -81,7 +81,7 @@ layout_inicio('Análises', 'analises', $usuario);
                     <header class="an-chat-topo">
                         <div class="an-chat-titulo">
                             <strong id="an-chat-titulo"><?= $conversa ? e($conversa['titulo']) : 'Nova conversa' ?></strong>
-                            <span class="meta">Lia responde com base nas vendas importadas</span>
+                            <span class="meta">A LIA responde com base nas vendas importadas</span>
                         </div>
                         <div class="linha-acoes">
                             <a class="btn btn-sec btn-sm" href="analises.php?modo=conversa">Nova conversa</a>
@@ -102,7 +102,7 @@ layout_inicio('Análises', 'analises', $usuario);
 <?php if ($m['papel'] === 'user'): ?>
                         <div class="an-msg an-msg-user"><div class="an-msg-papel">Você</div><div class="an-msg-texto"><?= e($m['conteudo']) ?></div></div>
 <?php else: ?>
-                        <div class="an-msg an-msg-ia"><div class="an-msg-papel">Lia</div><div class="an-msg-texto" data-md><?= e($m['conteudo']) ?></div></div>
+                        <div class="an-msg an-msg-ia"><div class="an-msg-papel">LIA</div><div class="an-msg-texto" data-md><?= e($m['conteudo']) ?></div></div>
 <?php endif; ?>
 <?php endforeach; ?>
                     </div>

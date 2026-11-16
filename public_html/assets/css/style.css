@@ -701,3 +701,4 @@ details.importar { margin-top: 16px; padding: 14px 20px; }
 .tabela th { border-bottom-color: var(--bege-detalhe); }
 .trad-bloco { border-left-color: var(--bege-detalhe); }
 .trad-bloco.aprovado { border-left-color: var(--success); }
+.an-abas .ia { color: var(--brand); }
