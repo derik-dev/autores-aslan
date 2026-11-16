@@ -64,23 +64,25 @@ function layout_inicio(string $titulo, string $ativo, array $usuario): void
 <div class="app">
     <button class="menu-toggle" type="button" aria-label="Abrir menu" data-menu-toggle>Menu</button>
     <aside class="sidebar" id="sidebar">
-        <div class="sidebar-brand">Autores</div>
+        <a class="sidebar-brand" href="index.php" aria-label="Autores: início">A</a>
         <nav class="sidebar-nav" aria-label="Principal">
             <?php [$rotulo, $link, $ico] = MENU['index']; ?>
-            <a href="<?= e($link) ?>" class="<?= $ativo === 'index' ? 'ativo' : '' ?>"<?= $ativo === 'index' ? ' aria-current="page"' : '' ?>><?= icone($ico) ?><span><?= e($rotulo) ?></span></a>
+            <a href="<?= e($link) ?>" data-rotulo="<?= e($rotulo) ?>" class="<?= $ativo === 'index' ? 'ativo' : '' ?>"<?= $ativo === 'index' ? ' aria-current="page"' : '' ?>><?= icone($ico) ?><span class="nav-rotulo"><?= e($rotulo) ?></span></a>
             <?php foreach (MENU_GRUPOS as $grupo => $chaves): ?>
                 <?php if (in_array('autores', $chaves, true) && !eh_editora($usuario)) { continue; } ?>
+                <div class="nav-sep" aria-hidden="true"></div>
                 <div class="nav-grupo"><?= e($grupo) ?></div>
                 <?php foreach ($chaves as $chave): [$rotulo, $link, $ico] = MENU[$chave]; ?>
-                    <a href="<?= e($link) ?>" class="<?= $chave === $ativo ? 'ativo' : '' ?>"<?= $chave === $ativo ? ' aria-current="page"' : '' ?>><?= icone($ico) ?><span><?= e($rotulo) ?></span></a>
+                    <a href="<?= e($link) ?>" data-rotulo="<?= e($rotulo) ?>" class="<?= $chave === $ativo ? 'ativo' : '' ?>"<?= $chave === $ativo ? ' aria-current="page"' : '' ?>><?= icone($ico) ?><span class="nav-rotulo"><?= e($rotulo) ?></span></a>
                 <?php endforeach; ?>
             <?php endforeach; ?>
         </nav>
         <div class="sidebar-user">
+            <span class="avatar" aria-hidden="true"><?= e(mb_strtoupper(mb_substr($usuario['nome'], 0, 1, 'UTF-8'), 'UTF-8')) ?></span>
             <span class="usuario-nome"><?= e($usuario['nome']) ?></span>
             <form method="post" action="logout.php">
                 <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
-                <button type="submit" class="link-sair"><?= icone('sair') ?>Sair</button>
+                <button type="submit" class="link-sair" data-rotulo="Sair"><?= icone('sair') ?><span class="nav-rotulo">Sair</span></button>
             </form>
         </div>
     </aside>
