@@ -126,7 +126,7 @@ layout_inicio('Vendas', 'vendas', $usuario);
             <section class="bloco">
                 <h2 class="bloco-titulo">Por livro</h2>
                 <div class="tabela-rolagem">
-                    <table class="tabela">
+                    <table class="tabela tabela-num">
                         <thead><tr><th>Livro</th><th>Exemplares</th><th>Vendas brutas</th><th>Receita do autor</th></tr></thead>
                         <tbody>
 <?php foreach ($porLivro as $l): ?>
@@ -140,7 +140,7 @@ layout_inicio('Vendas', 'vendas', $usuario);
             <section class="bloco">
                 <h2 class="bloco-titulo">Por canal de venda</h2>
                 <div class="tabela-rolagem">
-                    <table class="tabela">
+                    <table class="tabela tabela-num">
                         <thead><tr><th>Canal</th><th>Exemplares</th><th>Receita do autor</th></tr></thead>
                         <tbody>
 <?php foreach ($porCanal as $c): ?>

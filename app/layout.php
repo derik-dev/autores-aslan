@@ -64,7 +64,7 @@ function layout_inicio(string $titulo, string $ativo, array $usuario): void
 <div class="app">
     <button class="menu-toggle" type="button" aria-label="Abrir menu" data-menu-toggle>Menu</button>
     <aside class="sidebar" id="sidebar">
-        <a class="sidebar-brand" href="index.php" aria-label="Autores: início">A</a>
+        <a class="sidebar-brand" href="index.php"><span class="marca" aria-hidden="true">A</span>Autores</a>
         <nav class="sidebar-nav" aria-label="Principal">
             <?php [$rotulo, $link, $ico] = MENU['index']; ?>
             <a href="<?= e($link) ?>" data-rotulo="<?= e($rotulo) ?>" class="<?= $ativo === 'index' ? 'ativo' : '' ?>"<?= $ativo === 'index' ? ' aria-current="page"' : '' ?>><?= icone($ico) ?><span class="nav-rotulo"><?= e($rotulo) ?></span></a>
@@ -82,7 +82,7 @@ function layout_inicio(string $titulo, string $ativo, array $usuario): void
             <span class="usuario-nome"><?= e($usuario['nome']) ?></span>
             <form method="post" action="logout.php">
                 <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
-                <button type="submit" class="link-sair" data-rotulo="Sair"><?= icone('sair') ?><span class="nav-rotulo">Sair</span></button>
+                <button type="submit" class="link-sair"><?= icone('sair') ?><span class="nav-rotulo">Sair</span></button>
             </form>
         </div>
     </aside>

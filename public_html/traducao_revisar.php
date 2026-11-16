@@ -116,7 +116,7 @@ layout_inicio($ehRev ? 'Revisão do texto' : 'Revisão da tradução', $ehRev ? 
 <?php if ($feito): ?>
                 <div class="trad-alertas texto-2" aria-live="polite"></div>
                 <div class="trad-rodape">
-                    <button type="button" class="btn btn-sec btn-sm" data-acao="aprovar"><?= $apr ? 'Desfazer aprovação' : 'Aprovar trecho' ?></button>
+                    <button type="button" class="btn btn-sm <?= $apr ? 'btn-sec' : 'btn-aprovar' ?>" data-acao="aprovar"><?= $apr ? 'Desfazer aprovação' : 'Aprovar trecho' ?></button>
                     <button type="button" class="btn btn-sec btn-sm" data-acao="conferir">Conferir com IA</button>
                     <button type="button" class="btn btn-sec btn-sm" data-acao="pedir"><?= $ehRev ? 'Revisar de novo…' : 'Traduzir de novo…' ?></button>
                     <span class="texto-2 trad-estado" aria-live="polite"></span>

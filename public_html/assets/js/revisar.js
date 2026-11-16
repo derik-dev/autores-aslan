@@ -43,7 +43,7 @@
     chip.textContent = aprovado ? 'Aprovado' : (ehFeito(bloco) ? 'Pendente' : 'Não traduzido');
     chip.className = 'chip trad-chip ' + (aprovado ? 'chip-ok' : 'chip-neutro');
     var b = bloco.querySelector('[data-acao="aprovar"]');
-    if (b) b.textContent = aprovado ? 'Desfazer aprovação' : 'Aprovar trecho';
+    if (b) { b.textContent = aprovado ? 'Desfazer aprovação' : 'Aprovar trecho'; b.className = 'btn btn-sm ' + (aprovado ? 'btn-sec' : 'btn-aprovar'); }
     aplicarFiltro();
   }
 
