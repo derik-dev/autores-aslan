@@ -28,7 +28,7 @@ try {
     $s->execute([$usuario['id']]);
     $relatorios = $s->fetchAll();
 
-    $s = $pdo->prepare('SELECT id, titulo, atualizado_em FROM analise_conversas WHERE usuario_id = ? ORDER BY atualizado_em DESC, id DESC LIMIT 100');
+    $s = $pdo->prepare('SELECT id, titulo, atualizado_em FROM analise_conversas WHERE usuario_id = ? AND (id = ' . (int) $conversaId . ' OR EXISTS (SELECT 1 FROM analise_mensagens m WHERE m.conversa_id = analise_conversas.id)) ORDER BY atualizado_em DESC, id DESC LIMIT 100');
     $s->execute([$usuario['id']]);
     $conversas = $s->fetchAll();
 

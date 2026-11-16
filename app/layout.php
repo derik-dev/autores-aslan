@@ -58,6 +58,7 @@ function layout_inicio(string $titulo, string $ativo, array $usuario): void
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?= e($titulo) ?> · Autores</title>
+    <link rel="icon" type="image/svg+xml" href="<?= asset_url('assets/favicon.svg') ?>">
     <link rel="stylesheet" href="<?= asset_url('assets/css/style.css') ?>">
 </head>
 <body>

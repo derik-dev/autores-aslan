@@ -727,3 +727,25 @@ details.importar { margin-top: 16px; padding: 14px 20px; }
 .an-ir:hover { color: var(--brand-dark); text-decoration: underline; text-underline-offset: 3px; }
 .an-secao { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; margin-top: 12px; padding-bottom: 10px; border-bottom: 2px solid var(--bege-detalhe); scroll-margin-top: 16px; }
 .an-secao h3 { margin: 0; font-size: 20px; letter-spacing: -0.01em; }
+
+/* ---------- Acabamento encontrado na conferência do site real ---------- */
+/* Campos de arquivo e caixas de marcar com o estilo do sistema */
+input[type="file"] { font: inherit; color: var(--text-2); }
+input[type="file"]::file-selector-button {
+  font: inherit; font-size: 13px; font-weight: 600; color: var(--text);
+  background: var(--panel); border: 1px solid var(--border-strong); border-radius: var(--radius);
+  padding: 5px 12px; margin-right: 12px; cursor: pointer; transition: background-color .12s;
+}
+input[type="file"]::file-selector-button:hover { background: var(--hover); }
+input[type="checkbox"], input[type="radio"] { accent-color: var(--brand); }
+
+/* Duas colunas que viram uma quando o espaço é curto (evita texto cortado nos seletores) */
+.duas-colunas { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.form select { text-overflow: ellipsis; }
+
+/* Tabelas estreitas: o nome quebra em duas linhas e os números cabem sem cortar */
+.tabela-num td:first-child, .tabela-num th:first-child { white-space: normal; }
+.tabela-num th:not(:first-child), .tabela-num td:not(:first-child) { padding-left: 18px; }
+
+/* Início: três painéis por linha quando cabem */
+.indice-grade { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }

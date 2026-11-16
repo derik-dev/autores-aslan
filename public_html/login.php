@@ -33,6 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Entrar · Autores</title>
+    <link rel="icon" type="image/svg+xml" href="<?= asset_url('assets/favicon.svg') ?>">
     <link rel="stylesheet" href="<?= asset_url('assets/css/style.css') ?>">
 </head>
 <body class="pagina-login">
