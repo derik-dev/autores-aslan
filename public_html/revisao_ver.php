@@ -77,31 +77,45 @@ if (!$trad):
 <?php endif; ?>
 
         <div id="rv-app" data-csrf="<?= e(csrf_token()) ?>" data-id="<?= (int) $trad['id'] ?>">
-            <div class="rv-barra">
-                <div class="rv-resumo">
-                    <strong id="rv-titulo-contagem">0 correções</strong>
-                    <span class="meta" id="rv-detalhe-contagem"></span>
+            <header class="pr-cabeca">
+                <div class="pr-titulo">
+                    <h2 class="pr-nome"><?= e($trad['titulo']) ?></h2>
+                    <span class="chip chip-neutro" id="pr-estado">Em revisão</span>
                 </div>
-                <div class="rv-acoes">
-                    <div class="rv-modos" role="group" aria-label="Como ver o texto">
-                        <button type="button" class="btn btn-sec btn-sm ativo" data-modo="marcas">Com marcas</button>
-                        <button type="button" class="btn btn-sec btn-sm" data-modo="limpo">Texto corrigido</button>
-                        <button type="button" class="btn btn-sec btn-sm" data-modo="original">Original</button>
-                    </div>
+                <p class="meta" id="rv-detalhe-contagem"></p>
+                <div class="pr-progresso" aria-hidden="true"><i id="pr-barra"></i></div>
+                <div class="pr-abas" role="tablist" aria-label="Vistas">
+                    <button type="button" class="pr-aba ativo" role="tab" data-vista="alteracoes">Alterações <span class="pr-n" id="rv-titulo-contagem">0</span></button>
+                    <button type="button" class="pr-aba" role="tab" data-vista="final">Texto final</button>
+                    <button type="button" class="pr-aba" role="tab" data-vista="original">Original</button>
+                    <span class="pr-espaco"></span>
                     <button type="button" class="btn btn-sec btn-sm" id="rv-aceitar-todas">Aceitar todas</button>
-                    <button type="button" class="btn btn-sec btn-sm" id="rv-copiar">Copiar texto corrigido</button>
-                    <a class="btn btn-sec btn-sm" href="traducao_baixar.php?id=<?= (int) $trad['id'] ?>">Transferir .txt</a>
-                    <a class="btn btn-sec btn-sm" href="audio.php?traducao=<?= (int) $trad['id'] ?>">Gerar áudio deste texto</a>
+                    <button type="button" class="btn btn-primary btn-sm" id="pr-concluir">Concluir revisão</button>
                 </div>
-            </div>
+            </header>
             <p class="alerta" role="alert" id="rv-erro" hidden></p>
 
             <div class="rv-grade">
-                <section class="bloco rv-doc" id="rv-doc" data-modo="marcas">
-                    <h2 class="bloco-titulo">Texto</h2>
-                    <p class="rv-legenda texto-2">O <del>riscado</del> é o que estava escrito. O <ins>destacado</ins> é a proposta da IA. Carregue numa marca para ver porquê.</p>
-                    <div id="rv-texto"></div>
-                </section>
+                <div class="pr-principal">
+                    <section id="pr-vista-alteracoes" class="pr-vista">
+                        <div id="pr-diff" class="pr-diff"></div>
+                    </section>
+                    <section id="pr-vista-final" class="pr-vista" hidden>
+                        <div class="pr-fim bloco">
+                            <h2 class="bloco-titulo">Texto final</h2>
+                            <p class="texto-2" id="pr-fim-resumo"></p>
+                            <div class="rv-acoes">
+                                <button type="button" class="btn btn-sec btn-sm" id="rv-copiar">Copiar texto corrigido</button>
+                                <a class="btn btn-sec btn-sm" href="traducao_baixar.php?id=<?= (int) $trad['id'] ?>">Transferir .txt</a>
+                                <a class="btn btn-sec btn-sm" href="audio.php?traducao=<?= (int) $trad['id'] ?>">Gerar áudio deste texto</a>
+                            </div>
+                        </div>
+                        <div class="pr-papel" id="pr-final"></div>
+                    </section>
+                    <section id="pr-vista-original" class="pr-vista" hidden>
+                        <div class="pr-papel" id="pr-original"></div>
+                    </section>
+                </div>
 
                 <aside class="rv-lateral" aria-label="Correções">
                     <section class="bloco">
@@ -111,8 +125,6 @@ if (!$trad):
                     </section>
                 </aside>
             </div>
-
-            <div class="rv-balao" id="rv-balao" role="dialog" aria-live="polite" hidden></div>
         </div>
         <script type="application/json" id="rv-dados"><?= json_encode($dados, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?></script>
         <script>window.REV_TIPOS = <?= json_encode(REV_TIPOS, JSON_UNESCAPED_UNICODE) ?>;</script>
