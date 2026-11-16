@@ -131,6 +131,27 @@
     var c = el('article', 'pr-cartao');
     c.setAttribute('data-id', a.id);
     c.setAttribute('data-estado', a.e);
+
+    // Já decidida: o cartão recolhe para uma linha com o visto e a opção de desfazer
+    if (a.e !== 'pendente') {
+      c.classList.add('pr-resolvido');
+      var visto = el('span', 'pr-visto');
+      visto.setAttribute('aria-hidden', 'true');
+      visto.innerHTML = a.e === 'aceite'
+        ? '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>'
+        : '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>';
+      c.appendChild(visto);
+      var frase = el('span', 'pr-res-texto');
+      frase.appendChild(el('strong', '', a.e === 'aceite' ? 'Alteração aceite' : 'Original mantido'));
+      frase.appendChild(document.createTextNode(' · ' + descricaoItem(a)));
+      c.appendChild(frase);
+      var voltar = el('button', 'pr-desfazer', 'Desfazer');
+      voltar.type = 'button';
+      voltar.addEventListener('click', function () { decidir(a, 'pendente'); });
+      c.appendChild(voltar);
+      return c;
+    }
+
     var topo = el('div', 'pr-c-topo');
     topo.appendChild(el('span', 'pr-ia', 'IA'));
     topo.appendChild(el('strong', '', 'Correção ' + a.n));
@@ -450,6 +471,9 @@
       construir();
       atualizarContagem();
       prepararFinal();
+      // Tudo aceite: segue direto para o texto final, pronto a transferir
+      mudarVista('final');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     });
   });
 

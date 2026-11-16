@@ -150,3 +150,12 @@
 .rv-carga .alerta { margin-top: 18px; text-align: left; }
 .rv-carga-botoes { justify-content: center; margin-top: 18px; }
 @media (prefers-reduced-motion: reduce) { .rv-carga:not([hidden]) { animation: none; } .rv-carga .barra-audio i { transition: none; } }
+
+/* Correção já decidida: linha recolhida com o visto */
+.pr-cartao.pr-resolvido { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-color: var(--border); animation: pr-resolve 0.3s cubic-bezier(0.22, 1, 0.36, 1); }
+@keyframes pr-resolve { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+.pr-visto { flex: none; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; color: #fff; background: var(--success); }
+.pr-cartao[data-estado="rejeitada"] .pr-visto { background: var(--text-2); }
+.pr-res-texto { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-2); }
+.pr-res-texto strong { color: var(--text); }
+@media (prefers-reduced-motion: reduce) { .pr-cartao.pr-resolvido { animation: none; } }
