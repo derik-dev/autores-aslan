@@ -348,6 +348,7 @@ function an_relatorio(int $autorId, int $meses, string $foco, string $escopo): a
         . "{\n"
         . "  \"titulo\": \"título curto e específico do relatório\",\n"
         . "  \"resumo\": \"até 4 frases com as conclusões mais importantes, citando os números principais\",\n"
+        . "  \"pontos_chave\": [ \"de 3 a 4 frases curtas (até 110 caracteres cada) com o que o leitor precisa saber de imediato, cada uma com um número\" ],\n"
         . "  \"achados\": [ {\"titulo\": \"...\", \"evidencia\": \"os números que sustentam\", \"leitura\": \"o que isso significa para o negócio\", \"confianca\": \"alta|media|baixa\"} ],\n"
         . "  \"riscos\": [ {\"titulo\": \"...\", \"detalhe\": \"...\", \"gravidade\": \"alta|media|baixa\"} ],\n"
         . "  \"oportunidades\": [ {\"titulo\": \"...\", \"detalhe\": \"...\"} ],\n"
@@ -402,6 +403,9 @@ function an_limpar_ia(array $ia): array
     return [
         'titulo' => an_txt($ia['titulo'] ?? 'Análise de vendas', 140),
         'resumo' => an_txt($ia['resumo'] ?? '', 1200),
+        'pontos_chave' => $lista($ia['pontos_chave'] ?? [], 4, function ($i) {
+            return an_txt(is_array($i) ? '' : $i, 200);
+        }),
         'achados' => $lista($ia['achados'] ?? [], 6, function ($i) use ($item, $niv) {
             $i = $item($i);
             return ['titulo' => an_txt($i['titulo'] ?? '', 160), 'evidencia' => an_txt($i['evidencia'] ?? '', 500), 'leitura' => an_txt($i['leitura'] ?? '', 600), 'confianca' => an_escolha($i['confianca'] ?? '', $niv, 'media')];

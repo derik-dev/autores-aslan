@@ -451,10 +451,35 @@
         grade.appendChild(el('p', 'alerta todas', 'Chegaram vendas novas desde que este relatório foi gerado. Clique em Atualizar relatório para ver os números mais recentes.'));
       }
 
-      // Resumo executivo
-      var pRes = painel('Resumo executivo', 'todas');
+      // Resumo do relatório: leitura rápida no topo, com convite para seguir o relatório completo
+      var pRes = painel('Resumo do relatório', 'todas');
       pRes.appendChild(el('p', 'an-resumo', ia.resumo || ''));
+      var pontos = (ia.pontos_chave && ia.pontos_chave.length) ? ia.pontos_chave : (ia.achados || []).slice(0, 3).map(function (x) { return x.titulo; });
+      if (pontos.length) {
+        pRes.appendChild(el('p', 'an-resumo-rotulo', 'O essencial em poucas linhas'));
+        var ulRes = el('ul', 'an-pontos an-pontos-resumo');
+        pontos.forEach(function (x) { if (x) ulRes.appendChild(el('li', '', x)); });
+        pRes.appendChild(ulRes);
+      }
+      var rodRes = el('div', 'an-resumo-rodape');
+      rodRes.appendChild(el('span', '', 'Para entender melhor, siga o relatório abaixo.'));
+      var ir = el('a', 'an-ir', 'Ver o relatório completo');
+      ir.href = '#an-detalhe';
+      ir.insertAdjacentHTML('beforeend', '<svg class="icone" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>');
+      ir.addEventListener('click', function (ev) {
+        ev.preventDefault();
+        var alvo = document.getElementById('an-detalhe');
+        if (alvo) alvo.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+      rodRes.appendChild(ir);
+      pRes.appendChild(rodRes);
       grade.appendChild(pRes);
+
+      var secao = el('div', 'an-secao todas');
+      secao.id = 'an-detalhe';
+      secao.appendChild(el('h3', '', 'Relatório completo'));
+      secao.appendChild(el('span', 'meta', 'Números, tendência, achados, riscos e recomendações'));
+      grade.appendChild(secao);
 
       // Números principais: os três do primeiro nível, do mesmo tamanho
       var nums = el('div', 'numeros todas');

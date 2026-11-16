@@ -716,3 +716,14 @@ details.importar { margin-top: 16px; padding: 14px 20px; }
 .an-acoes-erro { margin-top: 16px; }
 @media (prefers-reduced-motion: reduce) { .an-esqueleto span { animation: none; } }
 .an-grade-rel { grid-template-columns: minmax(0, 1fr); }
+
+/* ---------- Resumo do relatório e divisória do relatório completo ---------- */
+.an-resumo-rotulo { margin: 18px 0 8px; font-size: 12.5px; font-weight: 600; color: var(--text-2); }
+.an-pontos-resumo { margin: 0; }
+.an-pontos-resumo li { font-size: 15px; margin-bottom: 6px; }
+.an-pontos-resumo li::marker { color: var(--bege-detalhe); }
+.an-resumo-rodape { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--border); color: var(--text-2); }
+.an-ir { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; color: var(--brand); text-decoration: none; }
+.an-ir:hover { color: var(--brand-dark); text-decoration: underline; text-underline-offset: 3px; }
+.an-secao { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; margin-top: 12px; padding-bottom: 10px; border-bottom: 2px solid var(--bege-detalhe); scroll-margin-top: 16px; }
+.an-secao h3 { margin: 0; font-size: 20px; letter-spacing: -0.01em; }
