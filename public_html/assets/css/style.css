@@ -331,3 +331,4 @@ a { color: var(--brand); }
   .lista-barras li { grid-template-columns: 60px 1fr; }
   .barra-valor { grid-column: 1 / -1; }
 }
+.rel-texto { max-height: 420px; overflow: auto; }
