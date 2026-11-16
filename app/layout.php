@@ -7,7 +7,6 @@ require_once __DIR__ . '/http.php';
 const MENU = [
     'index'     => ['Início',            'index.php',      'casa'],
     'audio'     => ['Texto em áudio',    'audio.php',      'audio'],
-    'traducao'  => ['Tradução',          'traducao.php',   'traducao'],
     'revisao'   => ['Revisão de textos', 'revisao.php',    'revisao'],
     'ebook'     => ['E-book',            'ebook.php',      'livro'],
     'inspiracao' => ['Inspiração',       'inspiracao.php', 'ideia'],
@@ -21,7 +20,7 @@ const MENU = [
 
 // Como o menu lateral e o início agrupam as funções.
 const MENU_GRUPOS = [
-    'Criar'    => ['audio', 'traducao', 'revisao', 'ebook', 'inspiracao'],
+    'Criar'    => ['audio', 'revisao', 'ebook', 'inspiracao'],
     'Publicar' => ['entregas', 'exemplares'],
     'Negócio'  => ['vendas', 'analises', 'mercado'],
     'Editora'  => ['autores'],
@@ -32,7 +31,6 @@ const ICONES = [
     'casa'    => '<path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',
     'audio'   => '<path d="M2 10v3"/><path d="M6 6v11"/><path d="M10 3v18"/><path d="M14 8v7"/><path d="M18 5v13"/><path d="M22 10v3"/>',
     'grafico' => '<path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/>',
-    'traducao' => '<path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/>',
     'revisao' => '<path d="m6 16 6-12 6 12"/><path d="M8 12h8"/><path d="m16 20 2 2 4-4"/>',
     'livro'   => '<path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/>',
     'ideia'   => '<path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/>',

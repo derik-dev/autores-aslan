@@ -7,7 +7,6 @@ $usuario = exigir_login();
 
 $descricoes = [
     'audio'      => 'Converta textos, até um livro inteiro, em áudio.',
-    'traducao'   => 'Traduza o livro e revise lado a lado com o original.',
     'revisao'    => 'Corrija ortografia e gramática e confira trecho a trecho.',
     'ebook'      => 'Transforme o texto em EPUB, ou em página para salvar como PDF.',
     'inspiracao' => 'Guarde ideias, personagens, pesquisas e imagens.',
@@ -19,7 +18,7 @@ $descricoes = [
     'autores'    => 'Crie contas de autor e redefina senhas.',
 ];
 
-// "Continue de onde parou": áudios e traduções/revisões que ainda não terminaram.
+// "Continue de onde parou": áudios e revisões de texto que ainda não terminaram.
 $andamento = [];
 try {
     $pdo = db();
@@ -32,18 +31,17 @@ try {
     $s = $pdo->prepare(
         'SELECT t.id, t.titulo, t.idioma, COUNT(p.id) AS total, COALESCE(SUM(p.feito), 0) AS feitos, COALESCE(SUM(p.aprovado), 0) AS aprovados
          FROM traducoes t LEFT JOIN traducao_trechos p ON p.traducao_id = t.id
-         WHERE t.usuario_id = ? GROUP BY t.id
+         WHERE t.usuario_id = ? AND t.idioma = ? GROUP BY t.id
          HAVING feitos < total OR aprovados < total
          ORDER BY t.id DESC LIMIT 6'
     );
-    $s->execute([$usuario['id']]);
+    $s->execute([$usuario['id'], 'rev']);
     foreach ($s->fetchAll() as $t) {
-        $rev   = $t['idioma'] === 'rev';
         $total = (int) $t['total'];
         if ((int) $t['feitos'] < $total) {
-            $andamento[] = [$rev ? 'revisao' : 'traducao', $rev ? 'revisao.php' : 'traducao.php', $t['titulo'], ($rev ? 'Revisão' : 'Tradução') . ' incompleta: ' . (int) $t['feitos'] . ' de ' . $total . ' trechos'];
+            $andamento[] = ['revisao', 'revisao.php', $t['titulo'], 'Revisão incompleta: ' . (int) $t['feitos'] . ' de ' . $total . ' trechos'];
         } else {
-            $andamento[] = [$rev ? 'revisao' : 'traducao', 'traducao_revisar.php?id=' . (int) $t['id'], $t['titulo'], 'Para aprovar: ' . ($total - (int) $t['aprovados']) . ' de ' . $total . ' trechos'];
+            $andamento[] = ['revisao', 'traducao_revisar.php?id=' . (int) $t['id'], $t['titulo'], 'Para aprovar: ' . ($total - (int) $t['aprovados']) . ' de ' . $total . ' trechos'];
         }
     }
 } catch (Throwable $e) {

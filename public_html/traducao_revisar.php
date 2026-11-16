@@ -24,11 +24,11 @@ try {
 
 if (!$trad) {
     http_response_code(404);
-    layout_inicio('Revisão da tradução', 'traducao', $usuario);
+    layout_inicio('Revisão de textos', 'revisao', $usuario);
     ?>
         <div class="vazio">
             <strong>Tradução não encontrada</strong>
-            Ela pode ter sido excluída. <a href="traducao.php">Voltar para Tradução</a>
+            Ela pode ter sido excluída. <a href="revisao.php">Voltar para Revisão de textos</a>
         </div>
 <?php
     layout_fim();
@@ -44,8 +44,8 @@ foreach ($trechos as $p) {
 }
 $ehRev = $trad['idioma'] === TRAD_REVISAO;
 $idiomaNome = TRAD_IDIOMAS[$trad['idioma']] ?? $trad['idioma'];
-$voltar = $ehRev ? 'revisao.php' : 'traducao.php';
-$rotuloVoltar = $ehRev ? 'Revisão de textos' : 'Tradução';
+$voltar = 'revisao.php';
+$rotuloVoltar = 'Revisão de textos';
 $pct        = $total ? (int) round($aprovados / $total * 100) : 0;
 
 function num(int $n): string
@@ -53,7 +53,7 @@ function num(int $n): string
     return number_format($n, 0, ',', '.');
 }
 
-layout_inicio($ehRev ? 'Revisão do texto' : 'Revisão da tradução', $ehRev ? 'revisao' : 'traducao', $usuario);
+layout_inicio($ehRev ? 'Revisão do texto' : 'Revisão da tradução', 'revisao', $usuario);
 ?>
         <p class="texto-2"><a href="<?= e($voltar) ?>"><?= e($rotuloVoltar) ?></a> / <strong><?= e($trad['titulo']) ?></strong><?= $ehRev ? '' : ' para ' . e($idiomaNome) ?>. <?= $ehRev ? 'À esquerda fica o seu texto. À direita fica o texto revisado: edite, aprove ou revise de novo, trecho a trecho.' : 'À esquerda fica o seu texto, que você pode corrigir. À direita fica a tradução, que você ajusta e aprova trecho a trecho.' ?></p>
 
@@ -65,7 +65,7 @@ layout_inicio($ehRev ? 'Revisão do texto' : 'Revisão da tradução', $ehRev ? 
                     <div class="linha-acoes">
                         <button type="button" class="btn btn-sec btn-sm" id="rev-todos">Aprovar todos os trechos</button>
                         <a class="btn btn-sec btn-sm" href="traducao_baixar.php?id=<?= (int) $trad['id'] ?>">Baixar .txt</a>
-                        <a class="btn btn-sec btn-sm" href="audio.php?traducao=<?= (int) $trad['id'] ?>">Gerar áudio desta tradução</a>
+                        <a class="btn btn-sec btn-sm" href="audio.php?traducao=<?= (int) $trad['id'] ?>"><?= $ehRev ? 'Gerar áudio deste texto' : 'Gerar áudio desta tradução' ?></a>
                     </div>
                 </div>
                 <div class="barra-audio" aria-hidden="true"><i id="rev-barra" style="width: <?= $pct ?>%"></i></div>
