@@ -3,6 +3,7 @@
 
 require_once __DIR__ . '/../app/auth.php';
 require_once __DIR__ . '/../app/traducoes.php';
+require_once __DIR__ . '/../app/revisao.php';
 
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
@@ -45,6 +46,18 @@ function traducao_do_usuario(int $id, int $usuarioId): array
 }
 
 // Contagem [traduzidos, aprovados, total] de uma tradução.
+// Alteração (correção marcada) que pertence ao utilizador, ou 404.
+function alteracao_do_usuario(int $alteracaoId, int $usuarioId): array
+{
+    $s = db()->prepare('SELECT a.* FROM revisao_alteracoes a JOIN traducoes t ON t.id = a.traducao_id WHERE a.id = ? AND t.usuario_id = ?');
+    $s->execute([$alteracaoId, $usuarioId]);
+    $a = $s->fetch();
+    if (!$a) {
+        falha('Correção não encontrada.', 404);
+    }
+    return $a;
+}
+
 function trad_contagem(int $id): array
 {
     $s = db()->prepare('SELECT COUNT(*) AS total, COALESCE(SUM(feito), 0) AS feitos, COALESCE(SUM(aprovado), 0) AS aprovados FROM traducao_trechos WHERE traducao_id = ?');
@@ -140,7 +153,10 @@ try {
             $ant->execute([$id, (int) $trecho['ordem'] - 1]);
             $contexto = trad_fim_do_texto($ant->fetchColumn() ?: '');
 
-            $traduzido = trad_traduzir($trecho['original'], $t['idioma'], (string) $t['instrucoes'], $contexto);
+            // Na revisão de textos, as alterações ficam guardadas uma a uma (para marcar e explicar no ecrã).
+            $traduzido = $t['idioma'] === TRAD_REVISAO
+                ? rev_processar_trecho($id, (int) $trecho['ordem'], (string) $trecho['original'])
+                : trad_traduzir($trecho['original'], $t['idioma'], (string) $t['instrucoes'], $contexto);
             $pdo->prepare('UPDATE traducao_trechos SET traduzido = ?, feito = 1, aprovado = 0 WHERE traducao_id = ? AND ordem = ?')
                 ->execute([$traduzido, $id, $trecho['ordem']]);
         } catch (Throwable $e) {
@@ -275,7 +291,9 @@ try {
 
         set_time_limit(175);
         try {
-            $novo = trad_traduzir($original, $t['idioma'], (string) $t['instrucoes'], $contexto, $ajuste);
+            $novo = $t['idioma'] === TRAD_REVISAO
+                ? rev_processar_trecho($id, $ordem, (string) $original)
+                : trad_traduzir($original, $t['idioma'], (string) $t['instrucoes'], $contexto, $ajuste);
         } catch (Throwable $e) {
             falha(mb_substr($e->getMessage(), 0, 480, 'UTF-8'), 502);
         }
@@ -283,6 +301,47 @@ try {
             ->execute([$novo, $id, $ordem]);
         [, $aprovados, $total] = trad_contagem($id);
         resp(['ok' => true, 'texto' => $novo, 'aprovados' => $aprovados, 'total' => $total]);
+    }
+
+    // ---------- Revisão de textos: decidir sobre uma correção ----------
+    if ($acao === 'alteracao_estado') {
+        $a      = alteracao_do_usuario((int) ($_POST['alteracao_id'] ?? 0), $usuario['id']);
+        $estado = (string) ($_POST['estado'] ?? '');
+        if (!in_array($estado, ['pendente', 'aceite', 'rejeitada'], true)) {
+            falha('Estado inválido.');
+        }
+        db()->prepare('UPDATE revisao_alteracoes SET estado = ? WHERE id = ?')->execute([$estado, $a['id']]);
+        rev_recompor_db((int) $a['traducao_id'], (int) $a['ordem']);
+        resp(['ok' => true, 'contagem' => rev_contagem((int) $a['traducao_id'])]);
+    }
+
+    if ($acao === 'alteracao_editar') {
+        $a     = alteracao_do_usuario((int) ($_POST['alteracao_id'] ?? 0), $usuario['id']);
+        $texto = (string) ($_POST['corrigido'] ?? '');
+        if (mb_strlen($texto, 'UTF-8') > 2000) {
+            falha('O texto da correção é demasiado longo.');
+        }
+        db()->prepare("UPDATE revisao_alteracoes SET corrigido = ?, estado = 'aceite' WHERE id = ?")->execute([$texto, $a['id']]);
+        rev_recompor_db((int) $a['traducao_id'], (int) $a['ordem']);
+        resp(['ok' => true, 'corrigido' => $texto, 'contagem' => rev_contagem((int) $a['traducao_id'])]);
+    }
+
+    if ($acao === 'alteracoes_aceitar') {
+        $id   = (int) ($_POST['id'] ?? 0);
+        $tipo = (string) ($_POST['tipo'] ?? '');
+        traducao_do_usuario($id, $usuario['id']);
+        $pdo = db();
+        if ($tipo !== '' && isset(REV_TIPOS[$tipo])) {
+            $pdo->prepare("UPDATE revisao_alteracoes SET estado = 'aceite' WHERE traducao_id = ? AND estado = 'pendente' AND tipo = ?")->execute([$id, $tipo]);
+        } else {
+            $pdo->prepare("UPDATE revisao_alteracoes SET estado = 'aceite' WHERE traducao_id = ? AND estado = 'pendente'")->execute([$id]);
+        }
+        $o = $pdo->prepare('SELECT DISTINCT ordem FROM revisao_alteracoes WHERE traducao_id = ?');
+        $o->execute([$id]);
+        foreach ($o->fetchAll() as $linha) {
+            rev_recompor_db($id, (int) $linha['ordem']);
+        }
+        resp(['ok' => true, 'contagem' => rev_contagem($id)]);
     }
 
     // ---------- Excluir ----------

@@ -215,3 +215,22 @@ CREATE TABLE IF NOT EXISTS analise_mensagens (
     KEY idx_mensagens_conversa (conversa_id, id),
     CONSTRAINT fk_mensagens_conversa FOREIGN KEY (conversa_id) REFERENCES analise_conversas(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ---------- Revisão de textos: correções marcadas, uma por alteração ----------
+-- pos e tam são posições em caracteres sobre o texto ORIGINAL do trecho. As decisões de cada alteração ficam em "estado".
+
+CREATE TABLE IF NOT EXISTS revisao_alteracoes (
+    id           INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    traducao_id  INT UNSIGNED NOT NULL,
+    ordem        INT UNSIGNED NOT NULL,
+    seq          INT UNSIGNED NOT NULL,
+    pos          INT UNSIGNED NOT NULL,
+    tam          INT UNSIGNED NOT NULL,
+    original     TEXT NOT NULL,
+    corrigido    TEXT NOT NULL,
+    tipo         VARCHAR(20) NOT NULL DEFAULT 'outra',
+    motivo       VARCHAR(600) NULL,
+    estado       ENUM('pendente','aceite','rejeitada') NOT NULL DEFAULT 'pendente',
+    KEY idx_rev_trecho (traducao_id, ordem, seq),
+    CONSTRAINT fk_rev_traducao FOREIGN KEY (traducao_id) REFERENCES traducoes(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

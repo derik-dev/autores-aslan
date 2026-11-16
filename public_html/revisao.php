@@ -1,50 +1,68 @@
 <?php
-// Tela "Revisão de textos": a IA corrige ortografia e gramática, trecho a trecho, e o editor revisa lado a lado.
+// Revisão de textos: a IA corrige ortografia e gramática (português de Portugal) e mostra cada correção marcada, com explicação.
 
 require_once __DIR__ . '/../app/layout.php';
-require_once __DIR__ . '/../app/traducoes.php';
 require_once __DIR__ . '/../app/http.php';
+require_once __DIR__ . '/../app/revisao.php';
 
 $usuario = exigir_login();
 
-$tabelasOk = true;
-$itens     = [];
+$tabelasOk   = true;
+$tabelaCorrecoes = true;
+$itens       = [];
+$correcoes   = [];
 try {
     $itens = trad_listar($usuario['id'], true);
 } catch (Throwable $e) {
     error_log('revisao.php: ' . $e->getMessage());
     $tabelasOk = false;
 }
+if ($tabelasOk) {
+    try {
+        $s = db()->prepare(
+            "SELECT a.traducao_id, COUNT(*) AS n, SUM(a.estado = 'pendente') AS pendentes
+             FROM revisao_alteracoes a JOIN traducoes t ON t.id = a.traducao_id
+             WHERE t.usuario_id = ? GROUP BY a.traducao_id"
+        );
+        $s->execute([$usuario['id']]);
+        foreach ($s->fetchAll() as $c) {
+            $correcoes[(int) $c['traducao_id']] = ['n' => (int) $c['n'], 'pendentes' => (int) $c['pendentes']];
+        }
+    } catch (Throwable $e) {
+        $tabelaCorrecoes = false;
+    }
+}
 
-$rotulosStatus = ['concluido' => 'Revisado', 'erro' => 'Erro', 'processando' => 'Revisando', 'pendente' => 'Incompleto'];
+$rotulosStatus = ['concluido' => 'Revisto', 'erro' => 'Erro', 'processando' => 'A rever', 'pendente' => 'Incompleto'];
 $classesStatus = ['concluido' => 'chip-ok', 'erro' => 'chip-erro', 'processando' => 'chip-neutro', 'pendente' => 'chip-neutro'];
 
 layout_inicio('Revisão de textos', 'revisao', $usuario);
 ?>
-        <p class="texto-2">Cole ou envie um texto. A IA corrige ortografia, acentuação, gramática e pontuação sem mudar o seu estilo, e você confere cada trecho lado a lado.</p>
+        <p class="texto-2">Cole ou carregue um texto. A IA corrige a ortografia, a acentuação, a gramática e a pontuação sem mudar o seu estilo, e mostra cada correção marcada no texto, com a explicação.</p>
 
-<?php if (!$tabelasOk): ?>
-        <p class="alerta" role="alert">As tabelas ainda não existem no banco. Importe o arquivo <strong>database/schema.sql</strong> no phpMyAdmin e recarregue esta página.</p>
-<?php else: ?>
+<?php if (!$tabelasOk || !$tabelaCorrecoes): ?>
+        <p class="alerta" role="alert">Faltam tabelas na base de dados. Importe o ficheiro <strong>database/schema.sql</strong> no phpMyAdmin e recarregue esta página.</p>
+<?php endif; ?>
+<?php if ($tabelasOk): ?>
         <div id="trad-app" data-modo="rev" data-csrf="<?= e(csrf_token()) ?>">
 
             <section class="bloco">
-                <h2 class="bloco-titulo">Novo texto para revisar</h2>
+                <h2 class="bloco-titulo">Novo texto para rever</h2>
                 <div class="form">
                     <label for="titulo">Título</label>
-                    <input type="text" id="titulo" maxlength="200" placeholder="Ex.: Capítulo 3 – A volta" autocomplete="off">
+                    <input type="text" id="titulo" maxlength="200" placeholder="Ex.: Capítulo 3 – O regresso" autocomplete="off">
 
                     <div class="rotulo-linha">
                         <label for="texto">Texto</label>
-                        <label for="arquivo" class="btn btn-sec btn-sm" id="rotulo-arquivo">Enviar arquivo (.txt ou .docx)</label>
+                        <label for="arquivo" class="btn btn-sec btn-sm" id="rotulo-arquivo">Carregar ficheiro (.txt ou .docx)</label>
                         <input type="file" id="arquivo" accept=".txt,.docx" hidden>
                     </div>
-                    <textarea id="texto" rows="10" placeholder="Cole aqui o texto que você quer revisar…"></textarea>
-                    <p id="resumo" class="texto-2">Nenhum texto ainda.</p>
+                    <textarea id="texto" rows="10" placeholder="Cole aqui o texto que quer rever…"></textarea>
+                    <p id="resumo" class="texto-2">Ainda não há texto.</p>
 
                     <p id="erro-form" class="alerta" role="alert" hidden></p>
                     <div>
-                        <button type="button" id="gerar" class="btn btn-primary">Revisar texto</button>
+                        <button type="button" id="gerar" class="btn btn-primary">Rever texto</button>
                     </div>
                 </div>
             </section>
@@ -54,29 +72,29 @@ layout_inicio('Revisão de textos', 'revisao', $usuario);
                 <div class="barra-audio" aria-hidden="true"><i id="and-barra"></i></div>
                 <p id="and-texto" class="texto-2"></p>
                 <p id="and-erro" class="alerta" role="alert" hidden></p>
-                <button type="button" id="and-tentar" class="btn btn-sec btn-sm" hidden>Continuar de onde parou</button>
+                <button type="button" id="and-tentar" class="btn btn-sec btn-sm" hidden>Continuar de onde ficou</button>
             </section>
 
             <section class="bloco">
-                <h2 class="bloco-titulo">Meus textos revisados</h2>
+                <h2 class="bloco-titulo">Os meus textos revistos</h2>
 <?php if (!$itens): ?>
                 <div class="vazio">
-                    <strong>Nenhum texto revisado ainda</strong>
-                    Cole um texto acima e clique em Revisar texto. O resultado aparece aqui, para conferir lado a lado.
+                    <strong>Ainda não reviu nenhum texto</strong>
+                    Cole um texto e carregue em Rever texto. O resultado aparece aqui, com as correções marcadas.
                 </div>
 <?php else: ?>
                 <ul class="lista-audios">
 <?php foreach ($itens as $a):
-    $total     = (int) $a['total'];
-    $feitos    = (int) $a['feitos'];
-    $aprovados = (int) $a['aprovados'];
-    $st        = $a['status'];
+    $total  = (int) $a['total'];
+    $feitos = (int) $a['feitos'];
+    $st     = $a['status'];
+    $c      = $correcoes[(int) $a['id']] ?? null;
 ?>
                     <li class="linha-audio" data-id="<?= (int) $a['id'] ?>" data-titulo="<?= e($a['titulo']) ?>">
                         <div class="linha-topo">
                             <div class="linha-info">
                                 <strong><?= e($a['titulo']) ?></strong>
-                                <span class="meta"><?= num_br((int) $a['total_chars']) ?> caracteres · <?= $feitos ?> de <?= $total ?> trechos revisados · <?= $aprovados ?> aprovados · <?= e(date('d/m/Y H:i', strtotime($a['criado_em']))) ?></span>
+                                <span class="meta"><?= num_br($a['total_chars']) ?> caracteres · <?= $feitos ?> de <?= $total ?> trechos revistos<?= $c ? ' · ' . $c['n'] . ($c['n'] === 1 ? ' correção' : ' correções') . ($c['pendentes'] > 0 ? ' (' . $c['pendentes'] . ' por rever)' : '') : '' ?> · <?= e(date('d/m/Y H:i', strtotime($a['criado_em']))) ?></span>
                             </div>
                             <span class="chip <?= e($classesStatus[$st] ?? 'chip-neutro') ?>"><?= e($rotulosStatus[$st] ?? $st) ?></span>
                         </div>
@@ -88,10 +106,10 @@ layout_inicio('Revisão de textos', 'revisao', $usuario);
                             <button type="button" class="btn btn-sec btn-sm" data-acao="continuar">Continuar</button>
 <?php endif; ?>
 <?php if ($feitos > 0): ?>
-                            <a class="btn btn-sec btn-sm" href="traducao_revisar.php?id=<?= (int) $a['id'] ?>">Conferir lado a lado</a>
-                            <a class="btn btn-sec btn-sm" href="traducao_baixar.php?id=<?= (int) $a['id'] ?>">Baixar .txt</a>
+                            <a class="btn btn-sec btn-sm" href="revisao_ver.php?id=<?= (int) $a['id'] ?>">Ver correções</a>
+                            <a class="btn btn-sec btn-sm" href="traducao_baixar.php?id=<?= (int) $a['id'] ?>">Transferir .txt</a>
 <?php endif; ?>
-                            <button type="button" class="btn btn-sec btn-sm" data-acao="excluir">Excluir</button>
+                            <button type="button" class="btn btn-sec btn-sm" data-acao="excluir">Eliminar</button>
                         </div>
                     </li>
 <?php endforeach; ?>
@@ -99,6 +117,6 @@ layout_inicio('Revisão de textos', 'revisao', $usuario);
 <?php endif; ?>
             </section>
         </div>
-        <script src="<?= asset_url('assets/js/traducao.js') ?>"></script>
+        <script src="<?= asset_url('assets/js/revisao.js') ?>"></script>
 <?php endif; ?>
 <?php layout_fim(); ?>

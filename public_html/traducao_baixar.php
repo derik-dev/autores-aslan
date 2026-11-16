@@ -26,7 +26,8 @@ if ($texto === '') {
     exit('Nenhum trecho foi traduzido ainda.');
 }
 
-$nome = trim(preg_replace('/[^\p{L}\p{N} _-]+/u', '', $t['titulo'] . ' ' . $t['idioma']));
+$sufixo = $t['idioma'] === 'rev' ? 'revisto' : $t['idioma'];
+$nome = trim(preg_replace('/[^\p{L}\p{N} _-]+/u', '', $t['titulo'] . ' ' . $sufixo));
 $nome = $nome !== '' ? $nome : 'traducao';
 
 header('Content-Type: text/plain; charset=utf-8');

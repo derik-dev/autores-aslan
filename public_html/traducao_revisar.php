@@ -22,6 +22,12 @@ try {
     error_log('traducao_revisar.php: ' . $e->getMessage());
 }
 
+// A revisão de textos tem a sua própria página, com as correções marcadas.
+if ($trad && $trad['idioma'] === TRAD_REVISAO) {
+    header('Location: revisao_ver.php?id=' . (int) $trad['id']);
+    exit;
+}
+
 if (!$trad) {
     http_response_code(404);
     layout_inicio('Revisão de textos', 'revisao', $usuario);

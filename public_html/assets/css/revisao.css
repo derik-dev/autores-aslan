@@ -1,0 +1,112 @@
+/* Revisão de textos: correções marcadas, barra lateral e balão explicativo */
+
+#rv-app { position: relative; }
+
+.rv-barra {
+  display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px 20px;
+  margin-top: 16px; padding: 14px 20px;
+  background: var(--panel); border: 1px solid var(--border); border-left: 3px solid var(--bege-detalhe); border-radius: var(--radius);
+}
+.rv-resumo { display: flex; flex-direction: column; gap: 2px; }
+.rv-resumo strong { font-size: 18px; letter-spacing: -0.01em; }
+.rv-acoes { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.rv-modos { display: inline-flex; margin-right: 4px; }
+.rv-modos .btn { border-radius: 0; margin-left: -1px; }
+.rv-modos .btn:first-child { border-radius: var(--radius) 0 0 var(--radius); margin-left: 0; }
+.rv-modos .btn:last-child { border-radius: 0 var(--radius) var(--radius) 0; }
+.rv-modos .btn.ativo { background: var(--hover); border-color: var(--bege-detalhe); font-weight: 600; position: relative; z-index: 1; }
+.rv-barra + .alerta, #rv-erro { margin-top: 16px; }
+
+.rv-grade { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 25px; align-items: start; margin-top: 25px; }
+.rv-doc { margin-top: 0; }
+.rv-legenda { margin: 0 0 18px; }
+.rv-legenda del, .rv-legenda ins { padding: 0 2px; }
+
+/* O texto */
+#rv-texto { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 16px; line-height: 1.9; max-width: 80ch; }
+.rv-trecho { margin-bottom: 22px; }
+.rv-por-rever { color: var(--text-2); }
+.rv-aviso-trecho { margin: 0 0 6px; font-size: 13px; font-weight: 600; color: var(--text-2); }
+
+/* As marcas */
+.rv-marca { font: inherit; color: inherit; background: none; border: 0; padding: 0; margin: 0; cursor: pointer; text-align: inherit; white-space: inherit; border-radius: 3px; }
+.rv-marca del, .rv-legenda del { color: #8C6B52; text-decoration: line-through; text-decoration-thickness: 1px; background: rgba(217, 195, 165, 0.28); }
+.rv-marca ins, .rv-legenda ins { text-decoration: none; color: var(--text); background: #F3E4CE; border-bottom: 2px solid var(--bege-detalhe); }
+.rv-marca:hover del, .rv-marca:hover ins { background-color: #EBD6B7; }
+.rv-marca.rv-ativa { outline: 2px solid var(--brand); outline-offset: 2px; }
+.rv-marca:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+
+/* Modo "Com marcas": o que já foi decidido fica discreto */
+[data-modo="marcas"] .rv-marca[data-estado="pendente"] del + ins { margin-left: 0.3em; }
+[data-modo="marcas"] .rv-marca[data-estado="aceite"] del { display: none; }
+[data-modo="marcas"] .rv-marca[data-estado="aceite"] ins { background: transparent; border-bottom: 1px dotted var(--brand); }
+[data-modo="marcas"] .rv-marca[data-estado="rejeitada"] ins { display: none; }
+[data-modo="marcas"] .rv-marca[data-estado="rejeitada"] del { text-decoration: none; color: inherit; background: transparent; border-bottom: 1px dashed var(--border-strong); }
+
+/* Modo "Texto corrigido": só o resultado das decisões */
+[data-modo="limpo"] .rv-marca del { display: none; }
+[data-modo="limpo"] .rv-marca ins { background: transparent; border: 0; }
+[data-modo="limpo"] .rv-marca[data-estado="rejeitada"] del { display: inline; text-decoration: none; color: inherit; background: transparent; }
+[data-modo="limpo"] .rv-marca[data-estado="rejeitada"] ins { display: none; }
+
+/* Modo "Original" */
+[data-modo="original"] .rv-marca ins { display: none; }
+[data-modo="original"] .rv-marca del { text-decoration: none; color: inherit; background: transparent; }
+
+/* Barra lateral */
+.rv-lateral { position: sticky; top: 16px; align-self: start; }
+.rv-lateral .bloco { margin-top: 0; }
+.rv-filtros { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.rv-chip { font: inherit; font-size: 12.5px; font-weight: 600; color: var(--text); background: var(--panel); border: 1px solid var(--border-strong); border-radius: var(--radius); padding: 3px 9px; cursor: pointer; }
+.rv-chip:hover { background: var(--hover); }
+.rv-chip.ativo { background: var(--hover); border-color: var(--bege-detalhe); }
+.rv-chip-n { color: var(--text-2); font-weight: 400; }
+.rv-lista { list-style: none; margin: 0; padding: 0; max-height: calc(100vh - 250px); overflow-y: auto; margin-right: -10px; padding-right: 10px; scrollbar-width: thin; scrollbar-color: var(--border-strong) transparent; }
+.rv-lista li[hidden] { display: none; }
+.rv-vazio { padding: 6px 0; }
+.rv-item { width: 100%; display: grid; grid-template-columns: 26px minmax(0, 1fr) 12px; align-items: center; gap: 10px; text-align: left; font: inherit; color: var(--text); background: transparent; border: 0; border-radius: var(--radius); padding: 8px; cursor: pointer; }
+.rv-item:hover, .rv-item.rv-ativa, li.rv-ativa .rv-item { background: var(--hover); }
+.rv-n { width: 24px; height: 24px; border: 1px solid var(--border-strong); border-radius: 50%; display: grid; place-items: center; font-size: 11.5px; font-weight: 600; color: var(--text-2); }
+.rv-corpo { display: flex; flex-direction: column; min-width: 0; }
+.rv-troca { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rv-tipo { font-size: 12px; color: var(--text-2); }
+.rv-estado { width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid var(--text-2); justify-self: end; }
+.rv-estado[data-estado="aceite"] { background: var(--success); border-color: var(--success); }
+.rv-estado[data-estado="rejeitada"] { background: var(--border-strong); border-color: var(--border-strong); }
+
+/* O balão */
+.rv-balao { position: absolute; z-index: 30; width: 340px; max-width: calc(100vw - 24px); background: var(--panel); border: 1px solid var(--bege-detalhe); border-top: 3px solid var(--bege-detalhe); border-radius: var(--radius); padding: 14px 16px 12px; }
+.rv-balao[hidden] { display: none; }
+.rv-b-topo { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
+.rv-b-titulo { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; }
+.rv-b-tipo { font-size: 12px; font-weight: 600; color: var(--brand); }
+.rv-b-x { font: inherit; font-size: 20px; line-height: 1; color: var(--text-2); background: none; border: 0; cursor: pointer; padding: 0 2px; }
+.rv-b-x:hover { color: var(--text); }
+.rv-b-troca { display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; background: #FCFAF6; border: 1px solid var(--border); border-radius: var(--radius); }
+.rv-b-troca > div { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+.rv-b-rotulo { min-width: 60px; font-size: 12px; font-weight: 600; color: var(--text-2); }
+.rv-b-troca del { color: #8C6B52; text-decoration: line-through; background: rgba(217, 195, 165, 0.28); }
+.rv-b-troca ins { text-decoration: none; background: #F3E4CE; border-bottom: 2px solid var(--bege-detalhe); }
+.rv-b-motivo { margin: 12px 0 4px; line-height: 1.55; }
+.rv-b-estado { margin: 0 0 10px; }
+.rv-b-edicao textarea { width: 100%; font: inherit; color: var(--text); background: var(--panel); border: 1px solid var(--border-strong); border-radius: var(--radius); padding: 8px 10px; resize: vertical; }
+.rv-b-edicao { margin-bottom: 8px; }
+.rv-b-botoes { display: flex; flex-wrap: wrap; gap: 8px; margin: 6px 0 0; }
+.rv-b-botoes[hidden], .rv-b-edicao[hidden] { display: none; }
+.rv-b-nav { display: flex; justify-content: space-between; margin-top: 12px; padding-top: 8px; border-top: 1px solid var(--border); }
+.rv-b-seta { font: inherit; font-size: 13px; font-weight: 600; color: var(--brand); background: none; border: 0; cursor: pointer; padding: 2px 0; }
+.rv-b-seta:hover { color: var(--brand-dark); text-decoration: underline; text-underline-offset: 3px; }
+
+@media (max-width: 1100px) {
+  .rv-grade { grid-template-columns: minmax(0, 1fr); }
+  .rv-lateral { position: static; }
+  .rv-lista { max-height: 320px; }
+}
+@media (max-width: 760px) {
+  .rv-balao { position: fixed; left: 8px; right: 8px; bottom: 8px; top: auto; width: auto; max-height: 70vh; overflow-y: auto; }
+  #rv-texto { font-size: 15.5px; }
+}
+@media print {
+  .rv-barra, .rv-lateral, .rv-balao, .rv-legenda { display: none !important; }
+  .rv-grade { grid-template-columns: 1fr; }
+}
