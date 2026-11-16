@@ -32,7 +32,6 @@ body {
   line-height: 1.55;
   color: var(--text);
   background: var(--bg);
-  font-variant-numeric: tabular-nums;
   -webkit-font-smoothing: antialiased;
 }
 a { color: var(--brand); text-underline-offset: 2px; text-decoration-thickness: 1px; }
@@ -383,3 +382,6 @@ a.btn { text-decoration: none; }
 @media (prefers-reduced-motion: reduce) {
   .barra-audio i, .btn { transition: none; }
 }
+
+/* Algarismos de mesma largura só onde há números alinhados */
+.tabela, .numeros, .barra-valor, .meta, .lista-barras { font-variant-numeric: tabular-nums; }

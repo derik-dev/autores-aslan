@@ -16,7 +16,7 @@ const MENU = [
     'vendas'    => ['Vendas',            'vendas.php',     'grafico'],
     'analises'  => ['Análises',          'analises.php',   'pulso'],
     'mercado'   => ['Mercado',           'mercado.php',    'busca'],
-    'autores'   => ['Autores',           'autores.php',    'pessoas'],
+    'autores'   => ['Autores',           'autores.php',    'autor'],
 ];
 
 // Como o menu lateral e o início agrupam as funções.
@@ -40,6 +40,7 @@ const ICONES = [
     'pessoas' => '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
     'pulso'   => '<path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"/>',
     'busca'   => '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+    'autor'   => '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6"/><path d="M22 11h-6"/>',
     'sair'    => '<path d="m16 17 5-5-5-5"/><path d="M21 12H9"/><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>',
 ];
 
