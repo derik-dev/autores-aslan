@@ -445,7 +445,6 @@
       if (id) acoes.appendChild(atualizar);
       if (id) acoes.appendChild(perguntar);
       acoes.appendChild(imprimir);
-      if (id) acoes.appendChild(apagar);
       cab.appendChild(acoes);
       grade.appendChild(cab);
       if (desatualizado) {

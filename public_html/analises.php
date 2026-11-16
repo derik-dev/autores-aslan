@@ -148,51 +148,7 @@ layout_inicio('Análises', 'analises', $usuario);
 
 <?php else: ?>
             <div class="an-grade an-grade-rel">
-                <aside class="an-lateral">
-                    <section class="bloco">
-                        <h2 class="bloco-titulo">Outro relatório</h2>
-                        <p class="texto-2 an-ajuda">O relatório principal já aparece ao lado. Use este painel para ver outro foco, período ou autor.</p>
-                        <div class="form">
-                            <label for="an-foco">Foco da análise</label>
-                            <select id="an-foco">
-<?php foreach (AN_FOCOS as $k => $rot): ?>
-                                <option value="<?= e($k) ?>"><?= e($rot) ?></option>
-<?php endforeach; ?>
-                            </select>
-                            <label for="an-periodo">Período</label>
-                            <select id="an-periodo">
-<?php foreach (AN_PERIODOS as $k => $rot): ?>
-                                <option value="<?= (int) $k ?>"><?= e($rot) ?></option>
-<?php endforeach; ?>
-                            </select>
-<?php if ($editora): ?>
-                            <label for="an-autor">Autor</label>
-                            <select id="an-autor">
-                                <option value="0">Todos os autores</option>
-<?php foreach ($autores as $a): ?>
-                                <option value="<?= (int) $a['id'] ?>"><?= e($a['nome']) ?></option>
-<?php endforeach; ?>
-                            </select>
-<?php endif; ?>
-                            <p class="alerta" role="alert" id="an-rel-erro" hidden></p>
-                            <p class="texto-2" id="an-rel-estado" aria-live="polite"></p>
-                            <div><button type="button" class="btn btn-sec" id="an-gerar">Gerar outro relatório</button></div>
-                        </div>
-                    </section>
-
-                    <section class="bloco">
-                        <h2 class="bloco-titulo">Relatórios anteriores</h2>
-<?php if (!$relatorios): ?>
-                        <p class="texto-2" id="an-sem-relatorios">Nenhum relatório ainda.</p>
-<?php endif; ?>
-                        <ul class="an-lista" id="an-lista-relatorios">
-<?php foreach ($relatorios as $r): ?>
-                            <li data-id="<?= (int) $r['id'] ?>"><a href="#" data-abrir="<?= (int) $r['id'] ?>"><span><?= e($r['titulo']) ?></span><small><?= e(date('d/m/Y H:i', strtotime($r['criado_em']))) ?></small></a></li>
-<?php endforeach; ?>
-                        </ul>
-                    </section>
-                </aside>
-
+                <p class="alerta" role="alert" id="an-rel-erro" hidden></p>
                 <div class="an-relatorio" id="an-relatorio-view">
                     <div class="vazio" id="an-rel-vazio">
                         <strong>Carregando o relatório…</strong>

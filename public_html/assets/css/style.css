@@ -715,3 +715,4 @@ details.importar { margin-top: 16px; padding: 14px 20px; }
 @keyframes an-pulso { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
 .an-acoes-erro { margin-top: 16px; }
 @media (prefers-reduced-motion: reduce) { .an-esqueleto span { animation: none; } }
+.an-grade-rel { grid-template-columns: minmax(0, 1fr); }
