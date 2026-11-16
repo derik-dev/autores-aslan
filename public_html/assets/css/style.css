@@ -545,9 +545,9 @@ details.importar { margin-top: 16px; padding: 14px 20px; }
 }
 
 /* ---------- Vendas: mais ar entre os blocos (só esta seção) ---------- */
-#vendas-app { column-gap: 40px; row-gap: 40px; margin-top: 32px; }
+#vendas-app { column-gap: 25px; row-gap: 25px; margin-top: 25px; }
 #vendas-app > * { margin-top: 0; }
 @media (max-width: 1100px) {
   #audio-app, #trad-app, #ent-app, #arc-app, #rel-app, #aut-app, #insp-app, #vendas-app { display: block; }
-  #vendas-app > * + * { margin-top: 32px; }
+  #vendas-app > * + * { margin-top: 25px; }
 }
