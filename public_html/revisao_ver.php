@@ -86,6 +86,7 @@ if (!$trad):
                 <div class="pr-progresso" aria-hidden="true"><i id="pr-barra"></i></div>
                 <div class="pr-abas" role="tablist" aria-label="Vistas">
                     <button type="button" class="pr-aba ativo" role="tab" data-vista="alteracoes">Alterações <span class="pr-n" id="rv-titulo-contagem">0</span></button>
+                    <button type="button" class="pr-aba" role="tab" data-vista="comparar">Comparar</button>
                     <button type="button" class="pr-aba" role="tab" data-vista="final">Texto final</button>
                     <button type="button" class="pr-aba" role="tab" data-vista="original">Original</button>
                     <span class="pr-espaco"></span>
@@ -99,6 +100,9 @@ if (!$trad):
                 <div class="pr-principal">
                     <section id="pr-vista-alteracoes" class="pr-vista">
                         <div id="pr-diff" class="pr-diff"></div>
+                    </section>
+                    <section id="pr-vista-comparar" class="pr-vista" hidden>
+                        <div class="pr-cmp" id="pr-comparar"></div>
                     </section>
                     <section id="pr-vista-final" class="pr-vista" hidden>
                         <div class="pr-fim bloco">

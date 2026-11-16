@@ -278,6 +278,7 @@
     atualizarContagem();
     aplicarFiltro();
     prepararFinal();
+    compararDesatualizado = true;
   }
   function decidir(a, estado) {
     if (ocupado) return;
@@ -434,7 +435,40 @@
     if (b) irPara(b.getAttribute('data-id'));
   });
 
-  // ---------- Vistas: Alterações / Texto final / Original ----------
+  // ---------- Comparar: original à esquerda, texto modificado à direita, linha a linha ----------
+  var compararDesatualizado = true;
+  function construirComparar() {
+    var caixa = $('pr-comparar');
+    caixa.innerHTML = '';
+    var topo = el('div', 'pr-cmp-linha pr-cmp-topo');
+    topo.appendChild(el('div', 'pr-cmp-cel', 'Original'));
+    topo.appendChild(el('div', 'pr-cmp-cel', 'Texto modificado'));
+    caixa.appendChild(topo);
+    linhas.forEach(function (l) {
+      var r = el('div', 'pr-cmp-linha' + (l.alts.length ? ' pr-cmp-mudou' : '') + (l.texto === '' ? ' pr-cmp-vazia' : ''));
+      var esq = el('div', 'pr-cmp-cel');
+      var dir = el('div', 'pr-cmp-cel');
+      esq.setAttribute('data-rotulo', 'Original');
+      dir.setAttribute('data-rotulo', 'Modificado');
+      if (l.alts.length) {
+        esq.appendChild(textoLinha(l, 'antes'));
+        dir.appendChild(textoLinha(l, 'depois'));
+      } else {
+        esq.textContent = l.texto || ' ';
+        dir.textContent = l.texto || ' ';
+      }
+      r.appendChild(esq);
+      r.appendChild(dir);
+      caixa.appendChild(r);
+    });
+    compararDesatualizado = false;
+  }
+  $('pr-comparar').addEventListener('click', function (ev) {
+    var m = ev.target.closest('.pr-marca');
+    if (m) irPara(m.getAttribute('data-id'));
+  });
+
+  // ---------- Vistas: Alterações / Comparar / Texto final / Original ----------
   function textoFinalDe(t) {
     var saida = '', cursor = 0;
     (t.alt || []).forEach(function (a) {
@@ -454,13 +488,14 @@
   $('pr-original').textContent = dados.trechos.map(function (t) { return t.texto; }).join('\n\n');
 
   function mudarVista(v) {
-    ['alteracoes', 'final', 'original'].forEach(function (x) { $('pr-vista-' + x).hidden = x !== v; });
+    ['alteracoes', 'comparar', 'final', 'original'].forEach(function (x) { $('pr-vista-' + x).hidden = x !== v; });
     document.querySelectorAll('.pr-aba').forEach(function (b) {
       var ativo = b.getAttribute('data-vista') === v;
       b.classList.toggle('ativo', ativo);
       b.setAttribute('aria-selected', ativo ? 'true' : 'false');
     });
     if (v === 'final') prepararFinal();
+    if (v === 'comparar' && compararDesatualizado) construirComparar();
   }
   document.querySelectorAll('.pr-aba').forEach(function (b) {
     b.addEventListener('click', function () { mudarVista(b.getAttribute('data-vista')); });
@@ -489,6 +524,7 @@
       construir();
       atualizarContagem();
       prepararFinal();
+      compararDesatualizado = true;
       // Tudo aceite: segue direto para o texto final, pronto a transferir
       mudarVista('final');
       window.scrollTo({ top: 0, behavior: 'smooth' });
