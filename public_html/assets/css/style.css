@@ -543,3 +543,13 @@ details.importar { margin-top: 16px; padding: 14px 20px; }
 @media (max-width: 1100px) {
   #audio-app, #trad-app, #ent-app, #arc-app, #rel-app, #aut-app, #insp-app, #vendas-app { display: block; }
 }
+
+/* ---------- Respiro entre blocos: 24px ---------- */
+.bloco, .numeros, details.importar, .indice-grupo, .indice-grade .indice-grupo { margin-top: 24px; }
+.filtro-autor { margin: 24px 0 0; }
+:is(#audio-app, #trad-app, #ent-app, #arc-app, #rel-app, #aut-app, #insp-app, #vendas-app) { column-gap: 24px; }
+.indice-grade { column-gap: 24px; }
+.trad-bloco { margin-bottom: 24px; }
+@media (max-width: 1100px) {
+  #audio-app, #trad-app, #ent-app, #arc-app, #rel-app, #aut-app, #insp-app, #vendas-app { display: block; }
+}
