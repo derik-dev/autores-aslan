@@ -11,6 +11,8 @@
   var erroGeral = document.getElementById('rev-erro');
   var botaoTodos = document.getElementById('rev-todos');
   var filtro = 'todos';
+  var REV = raiz.getAttribute('data-modo') === 'rev';
+  var VERBO = REV ? 'Revisar' : 'Traduzir';
   var salvando = 0;
 
   function chamar(acao, dados) {
@@ -234,13 +236,13 @@
       var campo = bloco.querySelector('.trad-novo input');
       var texto = bloco.querySelector('.trad-texto');
       b.disabled = true;
-      b.textContent = 'Traduzindo…';
-      estado(bloco, 'Traduzindo de novo, pode levar até 1 minuto…');
+      b.textContent = REV ? 'Revisando…' : 'Traduzindo…';
+      estado(bloco, (REV ? 'Revisando' : 'Traduzindo') + ' de novo, pode levar até 1 minuto…');
       salvarOriginal(bloco).then(function () {
         return chamar('retraduzir', { ordem: ordem, ajuste: campo.value });
       }).then(function (j) {
         b.disabled = false;
-        b.textContent = 'Traduzir este trecho de novo';
+        b.textContent = VERBO + ' este trecho de novo';
         if (!j.ok) { estado(bloco, 'Não deu certo: ' + j.erro); return; }
         texto.value = j.texto;
         texto.removeAttribute('data-sujo');
@@ -249,7 +251,7 @@
         campo.value = '';
         bloco.querySelector('.trad-novo').hidden = true;
         estadoOrig(bloco, '');
-        estado(bloco, 'Trecho traduzido de novo. Leia e aprove.');
+        estado(bloco, 'Trecho ' + (REV ? 'revisado' : 'traduzido') + ' de novo. Leia e aprove.');
         revisarBloco(bloco);
         atualizarContagem(j.aprovados, j.total);
       });

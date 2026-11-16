@@ -65,7 +65,7 @@ try {
             falha('Dê um título à tradução.');
         }
         $titulo = mb_substr($titulo, 0, 200, 'UTF-8');
-        if (!isset(TRAD_IDIOMAS[$idioma])) {
+        if (!isset(TRAD_IDIOMAS[$idioma]) && $idioma !== TRAD_REVISAO) {
             falha('Escolha o idioma da tradução.');
         }
         $instrucoes = mb_substr($instrucoes, 0, 6000, 'UTF-8');

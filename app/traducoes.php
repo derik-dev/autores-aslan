@@ -6,6 +6,7 @@ require_once __DIR__ . '/openai.php';
 
 const TRAD_TRECHO    = 3500;    // caracteres por trecho (a tradução tem tamanho parecido)
 const TRAD_MAX_CHARS = 500000;  // limite por livro
+const TRAD_REVISAO   = 'rev';   // modo "só corrigir" (a tela de Revisão de textos)
 
 const TRAD_IDIOMAS = [
     'en' => 'Inglês americano',
@@ -29,6 +30,10 @@ function trad_guia(string $idioma): string
 // Traduz um trecho. $contexto = final da tradução anterior (só para manter nomes e termos coerentes).
 function trad_traduzir(string $texto, string $idioma, string $instrucoes, string $contexto, string $ajuste = ''): string
 {
+    // Modo "revisão de textos": não traduz, só corrige ortografia e gramática no mesmo idioma.
+    if ($idioma === TRAD_REVISAO) {
+        return trad_corrigir($texto);
+    }
     $nomeIdioma = TRAD_IDIOMAS[$idioma] ?? 'Inglês';
 
     $sistema = "Você é um tradutor literário profissional. Traduza o texto entre as marcas <texto> para {$nomeIdioma}.\n"
@@ -110,7 +115,7 @@ function trad_fim_do_texto(?string $texto, int $max = 1200): string
 }
 
 // Traduções do usuário, com andamento.
-function trad_listar(int $usuarioId): array
+function trad_listar(int $usuarioId, bool $revisao = false): array
 {
     $sql = 'SELECT t.id, t.titulo, t.idioma, t.total_chars, t.status, t.erro, t.criado_em,
                    COUNT(p.id) AS total,
@@ -118,11 +123,11 @@ function trad_listar(int $usuarioId): array
                    COALESCE(SUM(p.aprovado), 0) AS aprovados
             FROM traducoes t
             LEFT JOIN traducao_trechos p ON p.traducao_id = t.id
-            WHERE t.usuario_id = ?
+            WHERE t.usuario_id = ? AND t.idioma ' . ($revisao ? '=' : '<>') . ' ?
             GROUP BY t.id
             ORDER BY t.id DESC';
     $stmt = db()->prepare($sql);
-    $stmt->execute([$usuarioId]);
+    $stmt->execute([$usuarioId, TRAD_REVISAO]);
     return $stmt->fetchAll();
 }
 

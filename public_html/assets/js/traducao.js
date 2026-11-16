@@ -14,6 +14,8 @@
   var painel = $('andamento'), andTitulo = $('and-titulo'), andBarra = $('and-barra');
   var andTexto = $('and-texto'), andErro = $('and-erro'), andTentar = $('and-tentar');
 
+  var REV = raiz.getAttribute('data-modo') === 'rev';
+  var rotuloGerar = gerar.textContent;
   var rodando = false;
   var ultimoId = null, ultimoTitulo = '';
 
@@ -43,7 +45,7 @@
     var trechos = Math.ceil(n / TRECHO);
     var paginas = Math.max(1, Math.round(n / PAGINA));
     var minutos = Math.max(1, Math.ceil(trechos * 25 / 60));
-    resumo.textContent = fmt(n) + ' caracteres (≈ ' + fmt(paginas) + ' páginas) · ' + fmt(trechos) + ' trechos · leva ≈ ' + minutos + ' min para traduzir';
+    resumo.textContent = fmt(n) + ' caracteres (≈ ' + fmt(paginas) + ' páginas) · ' + fmt(trechos) + ' trechos · leva ≈ ' + minutos + ' min para ' + (REV ? 'revisar' : 'traduzir');
   }
   texto.addEventListener('input', atualizarResumo);
 
@@ -70,16 +72,16 @@
   gerar.addEventListener('click', function () {
     if (rodando) return;
     erroForm.hidden = true;
-    if (!titulo.value.trim()) { mostrarErro(erroForm, 'Dê um título ao livro.'); titulo.focus(); return; }
-    if (!texto.value.trim()) { mostrarErro(erroForm, 'Cole ou envie o texto do livro.'); texto.focus(); return; }
+    if (!titulo.value.trim()) { mostrarErro(erroForm, 'Dê um título ao texto.'); titulo.focus(); return; }
+    if (!texto.value.trim()) { mostrarErro(erroForm, 'Cole ou envie o texto.'); texto.focus(); return; }
 
     gerar.disabled = true;
     gerar.textContent = 'Preparando o texto…';
     chamar('traducao_api.php?acao=criar', {
-      titulo: titulo.value.trim(), idioma: idioma.value, instrucoes: instrucoes.value, texto: texto.value
+      titulo: titulo.value.trim(), idioma: idioma ? idioma.value : 'rev', instrucoes: instrucoes ? instrucoes.value : '', texto: texto.value
     }).then(function (j) {
       gerar.disabled = false;
-      gerar.textContent = 'Traduzir livro';
+      gerar.textContent = rotuloGerar;
       if (!j.ok) { mostrarErro(erroForm, j.erro); return; }
       processar(j.id, titulo.value.trim());
     });
@@ -88,7 +90,7 @@
   function mostrarProgresso(feitos, total, segundosPorTrecho) {
     var pct = total ? Math.round(feitos / total * 100) : 0;
     andBarra.style.width = pct + '%';
-    var msg = 'Traduzindo trecho ' + Math.min(feitos + 1, total) + ' de ' + total + ' (' + pct + '%). Não feche esta aba.';
+    var msg = (REV ? 'Revisando trecho ' : 'Traduzindo trecho ') + Math.min(feitos + 1, total) + ' de ' + total + ' (' + pct + '%). Não feche esta aba.';
     if (segundosPorTrecho && feitos < total) {
       var min = Math.ceil((total - feitos) * segundosPorTrecho / 60);
       msg += ' Faltam ≈ ' + min + ' min.';
@@ -101,7 +103,7 @@
     rodando = true;
     ultimoId = id; ultimoTitulo = nome;
     painel.hidden = false;
-    andTitulo.textContent = 'Traduzindo: ' + nome;
+    andTitulo.textContent = (REV ? 'Revisando: ' : 'Traduzindo: ') + nome;
     andErro.hidden = true;
     andTentar.hidden = true;
     mostrarProgresso(0, 1, 0);
@@ -127,7 +129,7 @@
         if (j.concluido) {
           rodando = false;
           andBarra.style.width = '100%';
-          andTexto.textContent = 'Pronto! Abrindo a revisão…';
+          andTexto.textContent = (REV ? 'Pronto! Abrindo o texto revisado…' : 'Pronto! Abrindo a revisão…');
           setTimeout(function () { window.location.href = 'traducao_revisar.php?id=' + id; }, 900);
           return;
         }

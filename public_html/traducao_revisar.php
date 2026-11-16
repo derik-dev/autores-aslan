@@ -42,7 +42,10 @@ foreach ($trechos as $p) {
     $feitos    += (int) $p['feito'];
     $aprovados += (int) $p['aprovado'];
 }
+$ehRev = $trad['idioma'] === TRAD_REVISAO;
 $idiomaNome = TRAD_IDIOMAS[$trad['idioma']] ?? $trad['idioma'];
+$voltar = $ehRev ? 'revisao.php' : 'traducao.php';
+$rotuloVoltar = $ehRev ? 'Revisão de textos' : 'Tradução';
 $pct        = $total ? (int) round($aprovados / $total * 100) : 0;
 
 function num(int $n): string
@@ -50,11 +53,11 @@ function num(int $n): string
     return number_format($n, 0, ',', '.');
 }
 
-layout_inicio('Revisão da tradução', 'traducao', $usuario);
+layout_inicio($ehRev ? 'Revisão do texto' : 'Revisão da tradução', $ehRev ? 'revisao' : 'traducao', $usuario);
 ?>
-        <p class="texto-2"><a href="traducao.php">Tradução</a> / <strong><?= e($trad['titulo']) ?></strong> para <?= e($idiomaNome) ?>. À esquerda fica o seu texto, que você pode corrigir. À direita fica a tradução, que você ajusta e aprova trecho a trecho.</p>
+        <p class="texto-2"><a href="<?= e($voltar) ?>"><?= e($rotuloVoltar) ?></a> / <strong><?= e($trad['titulo']) ?></strong><?= $ehRev ? '' : ' para ' . e($idiomaNome) ?>. <?= $ehRev ? 'À esquerda fica o seu texto. À direita fica o texto revisado: edite, aprove ou revise de novo, trecho a trecho.' : 'À esquerda fica o seu texto, que você pode corrigir. À direita fica a tradução, que você ajusta e aprova trecho a trecho.' ?></p>
 
-        <div id="revisao" data-csrf="<?= e(csrf_token()) ?>" data-id="<?= (int) $trad['id'] ?>">
+        <div id="revisao" data-modo="<?= $ehRev ? 'rev' : 'trad' ?>" data-csrf="<?= e(csrf_token()) ?>" data-id="<?= (int) $trad['id'] ?>">
 
             <div class="trad-barra">
                 <div class="trad-barra-topo">
@@ -76,7 +79,7 @@ layout_inicio('Revisão da tradução', 'traducao', $usuario);
             </div>
 
 <?php if ($feitos < $total): ?>
-            <p class="alerta" role="alert">Faltam <?= $total - $feitos ?> trechos para traduzir. <a href="traducao.php">Volte para Tradução</a> e clique em Continuar traduzindo.</p>
+            <p class="alerta" role="alert">Faltam <?= $total - $feitos ?> trechos para traduzir. <a href="<?= e($voltar) ?>">Volte para <?= e($rotuloVoltar) ?></a> e clique em Continuar.</p>
 <?php endif; ?>
 
             <p id="rev-erro" class="alerta" role="alert" hidden></p>
@@ -102,7 +105,7 @@ layout_inicio('Revisão da tradução', 'traducao', $usuario);
                         </div>
                     </div>
                     <div class="trad-lado">
-                        <label class="trad-rotulo" for="t<?= $ord ?>">Tradução em <?= e($idiomaNome) ?></label>
+                        <label class="trad-rotulo" for="t<?= $ord ?>"><?= $ehRev ? 'Texto revisado' : 'Tradução em ' . e($idiomaNome) ?></label>
 <?php if ($feito): ?>
                         <textarea id="t<?= $ord ?>" class="trad-area trad-texto" rows="6"><?= e($p['traduzido']) ?></textarea>
 <?php else: ?>
@@ -115,7 +118,7 @@ layout_inicio('Revisão da tradução', 'traducao', $usuario);
                 <div class="trad-rodape">
                     <button type="button" class="btn btn-sec btn-sm" data-acao="aprovar"><?= $apr ? 'Desfazer aprovação' : 'Aprovar trecho' ?></button>
                     <button type="button" class="btn btn-sec btn-sm" data-acao="conferir">Conferir com IA</button>
-                    <button type="button" class="btn btn-sec btn-sm" data-acao="pedir">Traduzir de novo…</button>
+                    <button type="button" class="btn btn-sec btn-sm" data-acao="pedir"><?= $ehRev ? 'Revisar de novo…' : 'Traduzir de novo…' ?></button>
                     <span class="texto-2 trad-estado" aria-live="polite"></span>
                 </div>
                 <div class="trad-conferencia" hidden>

@@ -9,7 +9,7 @@ $usuario = exigir_login();
 $tabelasOk = true;
 $itens     = [];
 try {
-    $itens = trad_listar($usuario['id']);
+    $itens = trad_listar($usuario['id'], false);
 } catch (Throwable $e) {
     error_log('traducao.php: ' . $e->getMessage());
     $tabelasOk = false;
