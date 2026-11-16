@@ -11,7 +11,7 @@
   var resumo = $('resumo'), erroForm = $('erro-form'), gerar = $('gerar');
   var arquivo = $('arquivo'), soltar = $('rv-soltar'), soltarTitulo = $('rv-soltar-titulo'), rotuloArquivo = $('rotulo-arquivo');
   var painel = $('andamento'), andTitulo = $('and-titulo'), andBarra = $('and-barra');
-  var andTexto = $('and-texto'), andErro = $('and-erro'), andTentar = $('and-tentar');
+  var andTexto = $('and-texto'), andErro = $('and-erro'), andTentar = $('and-tentar'), andVoltar = $('and-voltar'), andPct = $('and-pct');
 
   var rodando = false;
   var ultimoId = null, ultimoTitulo = '';
@@ -102,25 +102,35 @@
   function mostrarProgresso(feitos, total, segundosPorTrecho) {
     var pct = total ? Math.round(feitos / total * 100) : 0;
     andBarra.style.width = pct + '%';
-    var msg = 'A rever o trecho ' + Math.min(feitos + 1, total) + ' de ' + total + ' (' + pct + '%). Não feche esta página.';
+    andPct.textContent = pct + '%';
+    var msg = 'Trecho ' + Math.min(feitos + 1, total) + ' de ' + total;
     if (segundosPorTrecho && feitos < total) {
       var min = Math.ceil((total - feitos) * segundosPorTrecho / 60);
-      msg += ' Faltam ≈ ' + min + ' min.';
+      msg += ' · faltam ≈ ' + min + ' min';
     }
     andTexto.textContent = msg;
+  }
+
+  function abrirCarga() {
+    painel.hidden = false;
+    document.body.style.overflow = 'hidden';
+  }
+  function fecharCarga() {
+    painel.hidden = true;
+    document.body.style.overflow = '';
   }
 
   function processar(id, nome) {
     if (rodando) return;
     rodando = true;
     ultimoId = id; ultimoTitulo = nome;
-    painel.hidden = false;
-    andTitulo.textContent = 'A rever: ' + nome;
+    abrirCarga();
+    andTitulo.textContent = nome;
     andErro.hidden = true;
     andTentar.hidden = true;
+    andVoltar.hidden = true;
     mostrarProgresso(0, 1, 0);
     andTexto.textContent = 'A começar…';
-    painel.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
     var inicio = Date.now(), feitosNoInicio = null;
 
@@ -136,11 +146,13 @@
           rodando = false;
           mostrarErro(andErro, j.erro);
           andTentar.hidden = false;
+          andVoltar.hidden = false;
           return;
         }
         if (j.concluido) {
           rodando = false;
           andBarra.style.width = '100%';
+          andPct.textContent = '100%';
           andTexto.textContent = 'Concluído! A abrir as correções…';
           setTimeout(function () { window.location.href = 'revisao_ver.php?id=' + id; }, 900);
           return;
@@ -151,6 +163,7 @@
     passo();
   }
 
+  andVoltar.addEventListener('click', function () { fecharCarga(); window.location.reload(); });
   andTentar.addEventListener('click', function () {
     if (ultimoId) processar(ultimoId, ultimoTitulo);
   });

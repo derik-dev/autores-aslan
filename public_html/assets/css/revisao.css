@@ -133,3 +133,20 @@
 .rv-envio #resumo { margin: 12px 0 0; }
 .rv-envio #gerar:disabled { opacity: 0.5; cursor: not-allowed; }
 .rv-soltar .texto-2 { font-weight: 400; font-size: 14.5px; max-width: 46ch; }
+
+/* Tela de carregamento enquanto a IA revê o texto */
+.rv-carga { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; padding: 24px; background: var(--bg, #fff); }
+.rv-carga[hidden] { display: none; }
+.rv-carga:not([hidden]) { animation: rv-carga-entra 0.35s cubic-bezier(0.22, 1, 0.36, 1); }
+@keyframes rv-carga-entra { from { opacity: 0; } to { opacity: 1; } }
+.rv-carga-caixa { width: 100%; max-width: 560px; text-align: center; }
+.rv-carga-rotulo { margin: 0 0 8px; font-size: 12.5px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-2); }
+.rv-carga-nome { margin: 0; font-size: 24px; letter-spacing: -0.02em; line-height: 1.25; overflow-wrap: anywhere; text-wrap: balance; }
+.rv-carga-pct { margin: 28px 0 14px; font-size: clamp(56px, 12vw, 88px); font-weight: 600; letter-spacing: -0.04em; line-height: 1; font-variant-numeric: tabular-nums; }
+.rv-carga .barra-audio { height: 6px; }
+.rv-carga .barra-audio i { transition: width 0.5s cubic-bezier(0.22, 1, 0.36, 1); }
+.rv-carga-estado { margin: 14px 0 6px; font-size: 16px; font-weight: 600; }
+.rv-carga .meta { margin: 0; }
+.rv-carga .alerta { margin-top: 18px; text-align: left; }
+.rv-carga-botoes { justify-content: center; margin-top: 18px; }
+@media (prefers-reduced-motion: reduce) { .rv-carga:not([hidden]) { animation: none; } .rv-carga .barra-audio i { transition: none; } }

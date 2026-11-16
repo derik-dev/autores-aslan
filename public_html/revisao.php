@@ -65,12 +65,20 @@ echo '<link rel="stylesheet" href="' . asset_url('assets/css/revisao.css') . '">
                 </div>
             </section>
 
-            <section id="andamento" class="bloco" hidden aria-live="polite">
-                <h2 class="bloco-titulo" id="and-titulo"></h2>
-                <div class="barra-audio" aria-hidden="true"><i id="and-barra"></i></div>
-                <p id="and-texto" class="texto-2"></p>
-                <p id="and-erro" class="alerta" role="alert" hidden></p>
-                <button type="button" id="and-tentar" class="btn btn-sec btn-sm" hidden>Continuar de onde ficou</button>
+            <section id="andamento" class="rv-carga" hidden role="dialog" aria-modal="true" aria-labelledby="and-titulo" aria-live="polite">
+                <div class="rv-carga-caixa">
+                    <p class="rv-carga-rotulo">A rever o texto</p>
+                    <h2 class="rv-carga-nome" id="and-titulo"></h2>
+                    <p class="rv-carga-pct" id="and-pct">0%</p>
+                    <div class="barra-audio" aria-hidden="true"><i id="and-barra"></i></div>
+                    <p id="and-texto" class="rv-carga-estado"></p>
+                    <p class="meta">Não feche esta página até terminar. Quando acabar, abre sozinha as correções.</p>
+                    <p id="and-erro" class="alerta" role="alert" hidden></p>
+                    <div class="rv-b-botoes rv-carga-botoes">
+                        <button type="button" id="and-tentar" class="btn btn-primary btn-sm" hidden>Continuar de onde ficou</button>
+                        <button type="button" id="and-voltar" class="btn btn-sec btn-sm" hidden>Voltar</button>
+                    </div>
+                </div>
             </section>
 
             <section class="bloco">
